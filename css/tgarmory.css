@@ -1,0 +1,15 @@
+.tga_block {vertical-align: top;}
+.tga_frame {border-spacing: 0; border-collapse: collapse;}
+.tga_frame > tbody > tr > td, .tga_frame > tbody > tr > th {background: url(http://static.thetabx.net/images/wow/armory_stats.2.jpg);}
+.tga_frame > tbody > tr > th {padding: 20 0 0 24;}
+.tga_frame > tbody > tr > td {padding: 14 0 0 18;}
+.tga_header {padding-left: 10px; font-weight: bold;}
+#arena_teams {padding-bottom: 10px;}
+.arena_teams {display: inline-block; margin: 8px; min-width: 222px; vertical-align: top;}
+.arena_teams .arena_bracket {color: #FFF; font-size: 36px; margin-left: 8px;}
+.arena_teams .arena_wins {color: #0C0;}
+.arena_teams .arena_loses {color: #C00;}
+.arena_teams .arena_percent {color: #C09A67;}
+.arena_teams .team_rating {padding: 8 8 8 8;}
+.arena_teams .arena_rating {color: #FC0; font-weight: bold; padding-left: 8px; padding-right: 8px;}
+.gear_updates {margin: 8px; min-width: 480px;}
