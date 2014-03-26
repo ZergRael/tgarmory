@@ -6,8 +6,8 @@ Improvements over the thegeekcrusade-serveur.com armory
 Pulls data from public proxy api - [Documentation gist](https://gist.github.com/ZergRael/9768262)
 
 
-Improvements :
-* Better wowhead-like item tooltips
+### Improvements :
+* Better Wowhead-like item tooltips
 * Display original tooltips with CTRL key
 * Fix items pictures positions on Chrome
 * Fix avatar picture with some races
@@ -21,10 +21,10 @@ Improvements :
 * Add arena teams, rating and positions
 
 
-Todo :
+### Todo :
 * Find a way to parse gems (unlikely)
 
 
-Changelog :
-* 0.1.0 *
+### Changelog :
+**0.1.1**
 Relatively stable code, ready to meet github

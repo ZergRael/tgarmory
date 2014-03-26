@@ -3,7 +3,7 @@
 
 // Hacks to simulate chrome APIs
 if(typeof chrome == "undefined") {
-	var isNotFirefox = true,
+	var isFirefox = true,
 		chrome = {
 			extension: {
 				getURL: function(str) {
@@ -37,7 +37,7 @@ function getData (obj, cb) {
 }
 
 function preInit () {
-	if(isNotFirefox) {
+	if(isFirefox) {
 		$("head").append("<link rel='stylesheet' type='text/css' href='" + chrome.extension.getURL("css/tgarmory.css") + "' />");
 	}
 	$("head").append("<link rel='stylesheet' type='text/css' href='http://static.thetabx.net/css/wow/wowheadlike.css' />");
@@ -77,7 +77,7 @@ function refactorItemTooltips () {
 			var $this = $(this);
 			if(slot == 16) {
 				$this.css("padding-left", "5px");
-				if(isNotFirefox) {
+				if(!isFirefox) {
 					$this.parents("table:first").first().css("top", "-25px");
 				}
 			}
