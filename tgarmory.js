@@ -360,7 +360,7 @@ function appendArena (data) {
 }
 
 var staticUrl = "http://static.thetabx.net/",
-	apiUrl = "http://betapi.thetabx.net/tgc/3/";
+	apiUrl = "http://api.thetabx.net/tgc/3/";
 (function () {
 	var u = parseUrl();
 	if(!u) { return; } // TGC check

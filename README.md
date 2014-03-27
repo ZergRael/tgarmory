@@ -26,6 +26,9 @@ Pulls data from public proxy api - [Documentation gist](https://gist.github.com/
 
 
 ### Changelog :
+**0.1.2**
+* Fixed ranged weapon missing enchant
+
 **0.1.1**
 * Fixed firefox detection
 
