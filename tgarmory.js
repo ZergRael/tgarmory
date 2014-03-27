@@ -228,7 +228,7 @@ function buildFrame (className, content) {
 function appendUpdates (data) {
 	var htmlContent = "",
 		// Missing enchant locales
-		slotTranslate = {head: "Tête", shoulder: "Épaules", back: "Dos", chest: "Torse", wrist: "Poignets", hands: "Mains", legs: "Jambes", feet: "Pieds", mainHand: "Arme", offHand: "Main gauche"},
+		slotTranslate = {head: "Tête", shoulder: "Épaules", back: "Dos", chest: "Torse", wrist: "Poignets", hands: "Mains", legs: "Jambes", feet: "Pieds", mainHand: "Arme", offHand: "Main gauche", ranged: "À distance"},
 		// Specs locales
 		specs = {
 			1: ["Armes", "Fureur", "Protection"],
