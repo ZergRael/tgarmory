@@ -1,4 +1,4 @@
-/*global $:false, i:true */
+/*global $:false, i:true, self:false*/
 "use strict";
 
 // Hacks to simulate chrome APIs
