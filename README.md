@@ -27,4 +27,6 @@ Pulls data from public proxy api - [Documentation gist](https://gist.github.com/
 
 ### Changelog :
 **0.1.1**
+Fixed firefox detection
+**0.1.0**
 Relatively stable code, ready to meet github

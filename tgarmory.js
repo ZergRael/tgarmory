@@ -13,10 +13,11 @@ if(typeof chrome == "undefined") {
 	};
 }
 
+// Format url into params hash
 function parseUrl () {
 	if(window.location.host != "thegeekcrusade-serveur.com") { return false; }
 	var search = window.location.search;
-	if(search.length === 0 || search[0] != "?") { return false; }
+	if(search.length === 0 || search[0] != "?") { return {}; }
 	var params = search.substring(1).split("&");
 	var keyValues = {};
 	for(var i in params) {
@@ -27,8 +28,9 @@ function parseUrl () {
 	return keyValues;
 }
 
+// Probably not necessary to encapsulate, looks nicer
 function getData (obj, cb) {
-	$.ajax({ // Preload
+	$.ajax({
 		url: apiUrl,
 		type: "GET",
 		data: obj,
@@ -36,8 +38,9 @@ function getData (obj, cb) {
 	});
 }
 
+// On start functions, mostly css additions and corrections
 function preInit () {
-	if(isFirefox) {
+	if(isFirefox) { // Firefox does not automatically insert extension css
 		$("head").append("<link rel='stylesheet' type='text/css' href='" + chrome.extension.getURL("css/tgarmory.css") + "' />");
 	}
 	$("head").append("<link rel='stylesheet' type='text/css' href='http://static.thetabx.net/css/wow/wowheadlike.css' />");
@@ -54,6 +57,8 @@ function insertScript (id, f, removeAfterUse) {
 	}
 }
 
+// Let's use native system to display tooltips, hackier than ever but doesn't break anything else
+// We can't use native montre() since tooltips comes with a children(visibility:none)
 function prepTooltip () {
 	insertScript("forceI", function() { i = true; }, true);
 }
@@ -65,6 +70,7 @@ function hideTooltip () {
 	insertScript("forceI", function() { i = false; }, true);
 	$("#curseur").css("visibility", "hidden").children().hide();
 }
+// Extract tooltips, reformat them to nicer wowhead like tooltips
 function refactorItemTooltips () {
 	var enchantItemRegex = /<span style=\\"color:#0C0;\\">(?!Equipé|Utilisé|Chance)([^<]+)/,
 		slot = 0,
@@ -72,15 +78,19 @@ function refactorItemTooltips () {
 		hovering = false,
 		showing = false,
 		isOriginalTooltip = false;
+	// Yes, that's ugly
 	$("td[onmouseover], td[style^='width:32px;;']").parent().each(function () {
+		// Still ugly, I know
 		$(this).children().each(function () {
 			var $this = $(this);
+			// Fix the horizontal and vertical padding on bottom tr
 			if(slot == 16) {
 				$this.css("padding-left", "5px");
 				if(!isFirefox) {
 					$this.parents("table:first").first().css("top", "-25px");
 				}
 			}
+			// Extract tooltip
 			if($this.attr("onmouseover")) {
 				var item = {
 					id: Number($this.children("a").first().attr("href").match(/\d+/)[0]),
@@ -90,10 +100,12 @@ function refactorItemTooltips () {
 
 				if(item.mouseover) {
 					var enchMatch = enchantItemRegex.exec(item.mouseover);
+					// Extract enchant string and sand it to incorporate enchant in tooltip
 					if(enchMatch) {
 						item.url.slot = slot;
 						item.url.enchstr = encodeURIComponent($.trim(enchMatch[1]));
 					}
+					// Keep original tooltip for ctrl comparison
 					item.originalTooltip = item.mouseover.substring(8, item.mouseover.length - 3).replace(/\\"/g, "\"");
 					$this.removeAttr("onmouseover").removeAttr("onmouseout");
 				}
@@ -101,13 +113,16 @@ function refactorItemTooltips () {
 			}
 			slot++;
 		});
-		$(this).html($(this).html()); // Overwrite html
+		// Rewrite tr html to force inline onmouseover erase, removeAttr is not enough
+		$(this).html($(this).html());
 	});
+	// Display better tooltips on every item link. $(document).on() because some item links may come later
 	$(document).on("mouseenter", "a[href^='index.php?box=armory&item']", function() {
 		var itemId = Number($(this).attr("href").match(/\d+/)[0]),
 			item = items[itemId];
 		hovering = itemId;
 		if(item && item.cache) {
+			// Show cached item tooltip if available
 			showing = item.id;
 			if(isOriginalTooltip && item.originalTooltip) {
 				showTooltip(item.originalTooltip);
@@ -118,9 +133,12 @@ function refactorItemTooltips () {
 		}
 		else {
 			if(!item) {
+				// It's an item we haven't parsed, just build it
 				item = {id: itemId, url: {item: itemId, tooltip: 1}};
 				items[itemId] = item;
 			}
+			// Allow #curseur to follow mouse even before data is ready
+			// Else, tooltip may be stuck on last hovered item
 			prepTooltip();
 			getData(item.url, function (data) {
 				item.cache = data;
@@ -140,7 +158,9 @@ function refactorItemTooltips () {
 		hovering = false;
 		hideTooltip();
 	}).on("keydown keyup", function(e) {
+		// CTRL key
 		if(e.which != 17) { return; }
+		// Toggle between new and original tooltip
 		if(e.type == "keydown") {
 			if(showing && !isOriginalTooltip && items[showing].originalTooltip) {
 				isOriginalTooltip = true;
@@ -156,6 +176,7 @@ function refactorItemTooltips () {
 	});
 }
 
+// Add character avatar if missing
 function fixAvatar () {
 	var $avatar = $("td[style^='height:82']");
 	if($avatar) {
@@ -166,6 +187,7 @@ function fixAvatar () {
 	}
 }
 
+// Add last talent point if needed (level = 70, points = 60)
 function fixTalents () {
 	var level = Number($("span[style^='color:#fcd20c;']").text().match(/\d+/)),
 		trees = [],
@@ -192,17 +214,22 @@ function fixTalents () {
 	trees[glitchedTree].tds.last().find("span").text(trees[glitchedTree].points + 1);
 }
 
+// Not beautiful, still needed. sprintf, where are you ?
 function dateToString (date, full) {
 	return (date.getDate() < 10 ? "0" : "") + date.getDate() + "/" + (date.getMonth() < 9 ? "0" : "") + (date.getMonth() + 1) + "/" + date.getFullYear() + (full ? " " + (date.getHours() < 10 ? "0" : "") + date.getHours() + ":" + (date.getMinutes() < 10 ? "0" : "") + date.getMinutes() : "");
 }
 
+// Create a table with proper borders
 function buildFrame (className, content) {
 	return "<table class='tga_frame " + className + "'><tbody><tr><td>" + content + "</td><th style='background-position: top right;'></th></tr><tr><th style='background-position: bottom left;'></th><th style='background-position: bottom right;'></th></tr></tbody></table>";
 }
 
+// Buttload of updates on character
 function appendUpdates (data) {
 	var htmlContent = "",
+		// Missing enchant locales
 		slotTranslate = {head: "Tête", shoulder: "Épaules", back: "Dos", chest: "Torse", wrist: "Poignets", hands: "Mains", legs: "Jambes", feet: "Pieds", mainHand: "Arme", offHand: "Main gauche"},
+		// Specs locales
 		specs = {
 			1: ["Armes", "Fureur", "Protection"],
 			2: ["Sacré", "Protection", "Vindicte"],
@@ -221,6 +248,7 @@ function appendUpdates (data) {
 			var elGuild = data.guildUpdates[iGuild];
 			if(elGuild.state == "joined") {
 				if(lastGuild) {
+					// Append name to last left guild and break;
 					lastGuild.guildName = elGuild.guildName;
 				}
 				else {
@@ -229,11 +257,13 @@ function appendUpdates (data) {
 				break;
 			}
 			if(elGuild.state == "left") {
+				// Api sends only left event without guildName
+				// Keep track of data until we find last joined guild
 				lastGuild = elGuild;
 			}
 		}
 		if(lastGuild && lastGuild.timestamp) {
-			htmlContent += "A " + (lastGuild.state == "left" ? "quitté" : "rejoint") + " &lt;" + lastGuild.guildName + "&gt; le " + dateToString(new Date(lastGuild.timestamp * 1000));
+			htmlContent += "A " + (lastGuild.state == "left" ? "quitté" : "rejoint") + " &lt;" + lastGuild.guildName + "&gt; le " + dateToString(new Date(lastGuild.timestamp * 1000)); // Firefox doesn't understand ruby Date.to_string, let's fallback on timestamp * 1000
 		}
 		else {
 			htmlContent += "Pas de changement de guilde récent";
@@ -243,10 +273,12 @@ function appendUpdates (data) {
 		htmlContent += "Pas de changement de guilde récent";
 	}
 	htmlContent += "</div><br /><div class='tga_averageilvl'>";
+	// Average item level, no more
 	if(data.averageItemLevel) {
 		htmlContent += "Niveau d'objet moyen : " + data.averageItemLevel;
 	}
 	htmlContent += "</div><br /><div class='tga_missingenchants'>";
+	// Missing enchants with proper locales
 	if(data.missingEnchants && data.missingEnchants.length > 0) {
 		var missingEnchants = [];
 		for(var iEnch = 0; iEnch < data.missingEnchants.length; iEnch++) {
@@ -259,6 +291,7 @@ function appendUpdates (data) {
 		htmlContent += "Pas d'enchantements manquants";
 	}
 	htmlContent += "</div><br /><div class='tga_gems'>";
+	// Gems sockets. &nbsp; is required for the last span to display ?!
 	if(data.gems && data.gems.sumSockets > 0) {
 		htmlContent += "Châsses : ";
 		for(var color in data.gems.sockets) {
@@ -270,6 +303,7 @@ function appendUpdates (data) {
 		htmlContent += "Pas de châsses de gemmes";
 	}
 	htmlContent += "</div><br /><div class='tga_spec'>";
+	// Spec summary with proper locale
 	if(data.talents.text) {
 		htmlContent += "<a href='" + data.talents.url + "'>Spécialisation (" + data.talents.text + ")</a>";
 		if(data.talents.dominantTree !== null) {
@@ -278,15 +312,17 @@ function appendUpdates (data) {
 	}
 	htmlContent += "</div>";
 
+	// append() in case block has data (never seen it)
 	$("table[style^='width:344px;height:190px;background-image:url(img/armory_stats.jpg)'] td:last").first().append(htmlContent).css({"text-align": "left", "padding": "18px", "vertical-align": "top"});
 }
 
+// Last gear pieces equipped list
 function appendGearUpdates (data) {
 	var htmlContent = "<span class='tga_header'>Derniers loots (niveau d'objet supérieur à 114) :</span><br />",
 		gearUpdates = data.gearUpdates;
 	if(gearUpdates.length > 0) {
 		htmlContent += gearUpdates.map(function(el, index) {
-			if(index < 6) {
+			if(index < 6) { // Hard limit to 6 items. Should be enough for most cases
 				return "<a href='index.php?box=armory&item=" + el.itemId + "'><img src='" + staticUrl + "images/wow/icons/small/" + el.icon.toLowerCase() + ".jpg' width='18' height='18' /> " + el.name + "</a> (" + dateToString(new Date(el.timestamp * 1000)) + ")<br />";
 			}
 		}).join("");
@@ -294,13 +330,16 @@ function appendGearUpdates (data) {
 	else {
 		htmlContent += "Pas de loots récents<br />";
 	}
+	// replace <br />, less waste of room
 	$("table.cursor").parent().children("br").first().replaceWith("<div id='gear_updates' class='tga_block'>" + buildFrame("gear_updates", htmlContent) + "</div>");
 }
 
+// team.members to html table row
 function teamToMembersHtml (team) {
 	return $.map(team.members, function(e) { return "<tr><td><a href='http://thegeekcrusade-serveur.com/index.php?box=armory&character=" + e.id + "'>" + e.name + "</a></td><td class='arena_rating'>" + e.rating + "</td><td><span class='arena_wins'>" + e.wins + "</span> - <span class='arena_loses'>" + e.loses + "</span></td><td><span class='arena_percent'>(" + e.percent + "%)</span></td></tr>"; }).join("");
 }
 
+// Arena teams if available
 function appendArena (data) {
 	if(data.arena.length === 0) { return; }
 	var brackets = [2, 3, 5], htmlContent = "", displayedTeams = 0;
@@ -313,6 +352,7 @@ function appendArena (data) {
 	if(htmlContent.length > 0) {
 		$("table.cursor").parent().children("br").first().replaceWith("<div id='arena_teams' class='tga_block'>" + htmlContent + "</div>");
 	}
+	// If there's only one bracket to display, try to inline it with the gearUpdates frame
 	if(displayedTeams == 1) {
 		$(".tga_block").css("display", "inline-block");
 		$(".arena_teams").css("display", "block");
@@ -320,18 +360,14 @@ function appendArena (data) {
 }
 
 var staticUrl = "http://static.thetabx.net/",
-	apiUrl = "http://api.thetabx.net/tgc/3/";
+	apiUrl = "http://betapi.thetabx.net/tgc/3/";
 (function () {
 	var u = parseUrl();
 	if(!u) { return; } // TGC check
 	if(!u.box || u.box != "armory") { return; } // Armory check
 	if(!u.character || u.character.length === 0 || isNaN(u.character)) { return; } // Char armory check
 	if($("table").length < 10) { return; } // Probably error page
-	
-	preInit();
-	fixTalents();
-	fixAvatar();
-	refactorItemTooltips();
+
 	getData({"char": u.character}, function(ajaxData) {
 		if(ajaxData.status == "success") {
 			appendUpdates(ajaxData.data);
@@ -339,4 +375,8 @@ var staticUrl = "http://static.thetabx.net/",
 			appendArena(ajaxData.data);
 		}
 	});
+	preInit();
+	fixTalents();
+	fixAvatar();
+	refactorItemTooltips();
 })();
