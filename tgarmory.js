@@ -189,55 +189,86 @@ function fixAvatar () {
 
 // Add last talent point if needed (level = 70, points = 60)
 function fixTalents (talents) {
-	var level = Number($("span[style^='color:#fcd20c;']").text().match(/\d+/)),
-		correctPoints = true;
+	var level = Number($("span[style^='color:#fcd20c;']").text().match(/\d+/))
+		talents = {total: 0, perTree: [0,0,0], perRow: [[], [], []], trees: [[], [], []]};
 	if(!level || level < 70) { return; }
-	var totalPoints = 0, treesPoints = [];
-	$("table.cursor>tbody>tr>td").each(function(i) {
-		$(this).find("td.cursor[valign] span").each(function() {
-			treesPoints.push(Number($(this).text()));
-			totalPoints += Number($(this).text());
+	var $trees = $("table.cursor>tbody>tr>td>center>table:nth-child(3n+2)");
+
+	// Discover trees and fix internal errors
+	$trees.each(function(treeN) {
+		if ($(this).find("tr").length == 0) {return;}
+		$(this).find("tr").each(function(rowN) {
+			if ($(this).find("td").length == 0) {return;}
+			var rowPoints = 0;
+			$(this).find("td.cursor").each(function(colN) {
+				var actualPoints = $(this).find("strong").first().text().match(/(\d)\/(\d)/);
+				var p = Number(actualPoints[1]), mP = Number(actualPoints[2]);
+				rowPoints += p;
+				if(!talents.trees[treeN][rowN]) { talents.trees[treeN][rowN] = []; }
+				talents.trees[treeN][rowN].push({p: p, mP: mP, node: $(this).find("strong").first()});
+			});
+			if (rowPoints > 0 && rowN > 0 && (1.0 * talents.perTree[treeN] / rowN) < 5.0) {
+				console.log("Missing points for this row [" + treeN + "][" + rowN + "]");
+				var fixedTree = false;
+				for(var row = rowN - 1; row >= 0; row--) {
+					for(var i = 0; i < talents.trees[treeN][row].length; i++) {
+						var t = talents.trees[treeN][row][i];
+						if(t.mP == 1 && t.p == 0) {
+							t.p = 1;
+							t.node.text(t.p + "/" + t.mP);
+							talents.total += t.p;
+							talents.perTree[treeN] += t.p;
+							talents.perRow[treeN][row] += t.p;
+							fixedTree = true;
+							break;
+						}
+					}
+					if(fixedTree) {break;}
+				}
+			}
+			talents.total += rowPoints;
+			talents.perTree[treeN] += rowPoints;
+			talents.perRow[treeN].push(rowPoints);
 		});
 	});
-	// Don't try correction if there's more than 1 missing point
-	if(totalPoints != 60) { correctPoints = false }
-	// Same if there's more than 1 point of difference by tree
-	if(talents.text && correctPoints) {
-		var ajaxTreePoints = talents.text.split("/");
-		for(var i = 0; i < ajaxTreePoints; i++) {
-			if(Math.abs(Number(ajaxTreePoints[i]) - treesPoints[i]) > 1) {
-				correctPoints = false;
+
+	// If there's still some missing points, try to add the 41st
+	if(talents.total != level - 9) {
+		for(var treeN = 0; treeN < talents.trees.length; treeN++) {
+			if(talents.perTree[treeN] >= 40) {
+				console.log("Missing last point with talents.total < 61");
+				talents.total += 1;
+				talents.perTree[treeN] += 1;
+				talents.perRow[treeN][talents.perRow[treeN].length - 1] += 1;
+				var talent = talents.trees[treeN][talents.trees[treeN].length - 1][0];
+				talent.p = 1;
+				talent.node.text("1/1");
 				break;
 			}
 		}
 	}
-	var strPos = 0;
-	$("table.cursor>tbody>tr>td").each(function(i) {
-		var treePoints = 0;
-		$(this).find("td.cursor:not([valign])").each(function() {
-			var $td = $(this);
-			var actualPoints = $td.find("strong").first().text().match(/(\d)\/(\d)/);
-			if(correctPoints) {
-				var ajaxPoints = Number(talents.simple.substr(strPos, 1));
-				treePoints += ajaxPoints;
-				if(Number(actualPoints[1]) != ajaxPoints) {
-					$td.find("strong").first().text(ajaxPoints + "/" + actualPoints[2]);
+
+	// If talents seems ok, let's correct colors
+	if(talents.total == level - 9) {
+		for(var treeN = 0; treeN < talents.trees.length; treeN++) {
+			for(var rowN = 0; rowN < talents.trees[treeN].length; rowN++) {
+				for(var colN = 0; colN < talents.trees[treeN][rowN].length; colN++) {
+					if(talents.trees[treeN][rowN][colN].p == 0) {
+						talents.trees[treeN][rowN][colN].node.css("color", "#999");
+					}
+					else {
+						talents.trees[treeN][rowN][colN].node.css("color", "#FC0");
+					}
 				}
 			}
-			if(totalPoints > 59) {
-				if((!correctPoints && Number(actualPoints[1]) == 0) || (correctPoints && ajaxPoints == 0)) {
-					$td.find("a:first").first().css("color", "#999");
-				}
-				else {
-					$td.find("a:first").first().css("color", "#FC0");
-				}
-			}
-			strPos++;
-		});
-		if(correctPoints) {
-			$(this).find("td.cursor[valign]:last span").first().text(treePoints);
 		}
+	}
+
+	// Finish with column bottom text correction
+	$("table.cursor>tbody>tr>td>center>table:nth-child(3n)").each(function(treeN) {
+		$(this).find("span").first().text(talents.perTree[treeN]);
 	});
+	//console.log(talents);
 }
 
 // Not beautiful, still needed. sprintf, where are you ?
