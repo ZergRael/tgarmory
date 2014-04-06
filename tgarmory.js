@@ -187,7 +187,7 @@ function fixAvatar () {
 	}
 }
 
-// Add last talent point if needed (level = 70, points = 60)
+// Try to correct talent trees
 function fixTalents (talents) {
 	var level = Number($("span[style^='color:#fcd20c;']").text().match(/\d+/))
 		talents = {total: 0, perTree: [0,0,0], perRow: [[], [], []], trees: [[], [], []]};
@@ -208,7 +208,7 @@ function fixTalents (talents) {
 				talents.trees[treeN][rowN].push({p: p, mP: mP, node: $(this).find("strong").first()});
 			});
 			if (rowPoints > 0 && rowN > 0 && (1.0 * talents.perTree[treeN] / rowN) < 5.0) {
-				console.log("Missing points for this row [" + treeN + "][" + rowN + "]");
+				//console.log("Missing points for this row [" + treeN + "][" + rowN + "]");
 				var fixedTree = false;
 				for(var row = rowN - 1; row >= 0; row--) {
 					for(var i = 0; i < talents.trees[treeN][row].length; i++) {
@@ -232,11 +232,11 @@ function fixTalents (talents) {
 		});
 	});
 
-	// If there's still some missing points, try to add the 41st
-	if(talents.total != level - 9) {
+	// Try to add 41st talent point. If there's more than 1 point missing, we can't just assume the 41st is really missing.
+	if(talents.total == level - 10) {
 		for(var treeN = 0; treeN < talents.trees.length; treeN++) {
 			if(talents.perTree[treeN] >= 40) {
-				console.log("Missing last point with talents.total < 61");
+				//console.log("Missing last point with talents.total < 61");
 				talents.total += 1;
 				talents.perTree[treeN] += 1;
 				talents.perRow[treeN][talents.perRow[treeN].length - 1] += 1;
