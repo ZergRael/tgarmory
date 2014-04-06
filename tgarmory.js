@@ -188,30 +188,56 @@ function fixAvatar () {
 }
 
 // Add last talent point if needed (level = 70, points = 60)
-function fixTalents () {
+function fixTalents (talents) {
 	var level = Number($("span[style^='color:#fcd20c;']").text().match(/\d+/)),
-		trees = [],
-		totalPoints = 0,
-		glitchedTree = false;
+		correctPoints = true;
 	if(!level || level < 70) { return; }
+	var totalPoints = 0, treesPoints = [];
 	$("table.cursor>tbody>tr>td").each(function(i) {
-		var $tds = $(this).find("td.cursor"),
-			points = Number($tds.last().find("span").first().text());
-		totalPoints += points;
-		trees[i] = {points: points, tds: $tds};
+		$(this).find("td.cursor[valign] span").each(function() {
+			treesPoints.push(Number($(this).text()));
+			totalPoints += Number($(this).text());
+		});
 	});
-	if(totalPoints == 61) { return; }
-	for(var iTree = 0; iTree < trees.length; iTree++) {
-		if(trees[iTree].points >= 40) {
-			glitchedTree = iTree;
-			break;
+	// Don't try correction if there's more than 1 missing point
+	if(totalPoints != 60) { correctPoints = false }
+	// Same if there's more than 1 point of difference by tree
+	if(talents.text && correctPoints) {
+		var ajaxTreePoints = talents.text.split("/");
+		for(var i = 0; i < ajaxTreePoints; i++) {
+			if(Math.abs(Number(ajaxTreePoints[i]) - treesPoints[i]) > 1) {
+				correctPoints = false;
+				break;
+			}
 		}
 	}
-	if(glitchedTree === false) { return; }
-	var $td = trees[glitchedTree].tds.eq(trees[glitchedTree].tds.length - 2);
-	$td.find("a:first").first().css("color", "#FC0");
-	$td.find("strong").first().text("1/1");
-	trees[glitchedTree].tds.last().find("span").text(trees[glitchedTree].points + 1);
+	var strPos = 0;
+	$("table.cursor>tbody>tr>td").each(function(i) {
+		var treePoints = 0;
+		$(this).find("td.cursor:not([valign])").each(function() {
+			var $td = $(this);
+			var actualPoints = $td.find("strong").first().text().match(/(\d)\/(\d)/);
+			if(correctPoints) {
+				var ajaxPoints = Number(talents.simple.substr(strPos, 1));
+				treePoints += ajaxPoints;
+				if(Number(actualPoints[1]) != ajaxPoints) {
+					$td.find("strong").first().text(ajaxPoints + "/" + actualPoints[2]);
+				}
+			}
+			if(totalPoints > 59) {
+				if((!correctPoints && Number(actualPoints[1]) == 0) || (correctPoints && ajaxPoints == 0)) {
+					$td.find("a:first").first().css("color", "#999");
+				}
+				else {
+					$td.find("a:first").first().css("color", "#FC0");
+				}
+			}
+			strPos++;
+		});
+		if(correctPoints) {
+			$(this).find("td.cursor[valign]:last span").first().text(treePoints);
+		}
+	});
 }
 
 // Not beautiful, still needed. sprintf, where are you ?
@@ -317,9 +343,8 @@ function appendUpdates (data) {
 }
 
 // Last gear pieces equipped list
-function appendGearUpdates (data) {
-	var htmlContent = "<span class='tga_header'>Derniers loots (niveau d'objet supérieur à 114) :</span><br />",
-		gearUpdates = data.gearUpdates;
+function appendGearUpdates (gearUpdates) {
+	var htmlContent = "<span class='tga_header'>Derniers loots (niveau d'objet supérieur à 114) :</span><br />";
 	if(gearUpdates.length > 0) {
 		htmlContent += gearUpdates.map(function(el, index) {
 			if(index < 6) { // Hard limit to 6 items. Should be enough for most cases
@@ -341,10 +366,10 @@ function teamToMembersHtml (team) {
 
 // Arena teams if available
 function appendArena (data) {
-	if(data.arena.length === 0) { return; }
+	if(data.length === 0) { return; }
 	var brackets = [2, 3, 5], htmlContent = "", displayedTeams = 0;
 	for(var i = 0; i < brackets.length; i++) {
-		var team = data.arena[brackets[i]];
+		var team = data[brackets[i]];
 		if(!team) { continue; }
 		displayedTeams++;
 		htmlContent += buildFrame("arena_teams", "<div class='arena_bracket'><a href='http://thegeekcrusade-serveur.com/index.php?box=pvp&type=" + brackets[i] + "'>" + brackets[i] + "v" + brackets[i] + "</a></div>" + team.name + " <a class='arena_position' href='http://thegeekcrusade-serveur.com/index.php?box=armory&team=" + team.id + "'>#" + team.position + "</a><br /><table><tbody><tr><td>Equipe</td><td class='arena_rating team_rating'>" + team.rating + "</td><td><span class='arena_wins'>" + team.wins + "</span> - <span class='arena_loses'>" + team.loses + "</span></td></tr>" + teamToMembersHtml(team) + "</tbody></table>");
@@ -371,12 +396,12 @@ var staticUrl = "http://static.thetabx.net/",
 	getData({"char": u.character}, function(ajaxData) {
 		if(ajaxData.status == "success") {
 			appendUpdates(ajaxData.data);
-			appendGearUpdates(ajaxData.data);
-			appendArena(ajaxData.data);
+			appendGearUpdates(ajaxData.data.gearUpdates);
+			appendArena(ajaxData.data.arena);
+			fixTalents(ajaxData.data.talents);
 		}
 	});
 	preInit();
-	fixTalents();
 	fixAvatar();
 	refactorItemTooltips();
 })();
