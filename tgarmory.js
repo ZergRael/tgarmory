@@ -34,6 +34,7 @@ function getData (obj, cb) {
 		url: apiUrl,
 		type: "GET",
 		data: obj,
+		cache: true,
 		success: cb
 	});
 }
@@ -92,7 +93,6 @@ function refactorItemTooltips () {
 		if($this.attr("onmouseover")) {
 			var item = {
 				id: Number($this.children("a").first().attr("href").match(/\d+/)[0]),
-				slot: slot,
 				mouseover: $this.attr("onmouseover")
 			};
 			item.url = {item: item.id, tooltip: 1};
