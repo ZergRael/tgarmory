@@ -71,85 +71,88 @@ function hideTooltip () {
 	$("#curseur").css("visibility", "hidden").children().hide();
 }
 // Extract tooltips, reformat them to nicer wowhead like tooltips
+var items = {};
 function refactorItemTooltips () {
 	var enchantItemRegex = /<span style=\\"color:#0C0;\\">(?!Equipé|Utilisé|Chance)([^<]+)/,
 		slot = 0,
-		items = {},
 		hovering = false,
 		showing = false,
+		equippedShowing = false,
 		isOriginalTooltip = false;
-	// Yes, that's ugly
-	$("td[onmouseover], td[style^='width:32px;;']").parent().each(function () {
-		// Still ugly, I know
-		$(this).children().each(function () {
-			var $this = $(this);
-			// Fix the horizontal and vertical padding on bottom tr
-			if(slot == 16) {
-				$this.css("padding-left", "5px");
-				if(!isFirefox) {
-					$this.parents("table:first").first().css("top", "-25px");
-				}
+	$("td[onmouseover], td[style^='width:32px;;']").each(function () {
+		var $this = $(this);
+		// Fix the horizontal and vertical padding on bottom tr
+		if(slot == 16) {
+			$this.css("padding-left", "5px");
+			if(!isFirefox) {
+				$this.parents("table:first").first().css("top", "-25px");
 			}
-			// Extract tooltip
-			if($this.attr("onmouseover")) {
-				var item = {
-					id: Number($this.children("a").first().attr("href").match(/\d+/)[0]),
-					mouseover: $this.attr("onmouseover")
-				};
-				item.url = {item: item.id, tooltip: 1};
+		}
+		// Extract tooltip
+		if($this.attr("onmouseover")) {
+			var item = {
+				id: Number($this.children("a").first().attr("href").match(/\d+/)[0]),
+				slot: slot,
+				mouseover: $this.attr("onmouseover")
+			};
+			item.url = {item: item.id, tooltip: 1};
 
-				if(item.mouseover) {
-					var enchMatch = enchantItemRegex.exec(item.mouseover);
-					// Extract enchant string and sand it to incorporate enchant in tooltip
-					if(enchMatch) {
-						item.url.slot = slot;
-						item.url.enchstr = encodeURIComponent($.trim(enchMatch[1]));
-					}
-					// Keep original tooltip for ctrl comparison
-					item.originalTooltip = item.mouseover.substring(8, item.mouseover.length - 3).replace(/\\"/g, "\"");
-					$this.removeAttr("onmouseover").removeAttr("onmouseout");
+			if(item.mouseover) {
+				var enchMatch = enchantItemRegex.exec(item.mouseover);
+				// Extract enchant string and sand it to incorporate enchant in tooltip
+				if(enchMatch) {
+					item.url.slot = slot;
+					item.url.enchstr = encodeURIComponent($.trim(enchMatch[1]));
 				}
-				items[item.id] = item;
+				// Keep original tooltip for ctrl comparison
+				item.originalTooltip = item.mouseover.substring(8, item.mouseover.length - 3).replace(/\\"/g, "\"");
+				$this.removeAttr("onmouseover").removeAttr("onmouseout").children("a").attr("data_slot", slot);
 			}
-			slot++;
-		});
+			items[item.id] = item;
+		}
+		slot++;
+	}).parent().each(function() {
 		// Rewrite tr html to force inline onmouseover erase, removeAttr is not enough
 		$(this).html($(this).html());
 	});
 	// Display better tooltips on every item link. $(document).on() because some item links may come later
 	$(document).on("mouseenter", "a[href^='index.php?box=armory&item']", function() {
 		var itemId = Number($(this).attr("href").match(/\d+/)[0]),
+			slot = $(this).attr("data_slot"),
 			item = items[itemId];
-		hovering = itemId;
-		if(item && item.cache) {
+		hovering = item;
+		if(item && (slot ? item.equippedCache : item.cache)) {
 			// Show cached item tooltip if available
 			showing = item.id;
+			equippedShowing = !!slot;
 			if(isOriginalTooltip && item.originalTooltip) {
 				showTooltip(item.originalTooltip);
 			}
 			else {
-				showTooltip(item.cache);
+				showTooltip(slot ? item.equippedCache : item.cache);
 			}
 		}
 		else {
 			if(!item) {
 				// It's an item we haven't parsed, just build it
-				item = {id: itemId, url: {item: itemId, tooltip: 1}};
-				items[itemId] = item;
+				item = {id: itemId, slot: slot, url: {item: itemId, tooltip: 1}};
+				items[item] = item;
 			}
 			// Allow #curseur to follow mouse even before data is ready
 			// Else, tooltip may be stuck on last hovered item
 			prepTooltip();
-			getData(item.url, function (data) {
-				item.cache = data;
-				if(hovering == itemId) {
+			getData(slot ? item.url : {item: itemId, tooltip: 1}, function (data) {
+				if(slot) { item.equippedCache = data; }
+				else { item.cache = data; }
+				if(hovering == item) {
 					if(isOriginalTooltip && item.originalTooltip) {
 						showTooltip(item.originalTooltip);
 					}
 					else {
 						showTooltip(data);
 					}
-					showing = itemId;
+					showing = item.id;
+					equippedShowing = !!slot;
 				}
 			});
 		}
@@ -170,7 +173,7 @@ function refactorItemTooltips () {
 		else if(e.type == "keyup") {
 			isOriginalTooltip = false;
 			if(showing) {
-				showTooltip(items[showing].cache);
+				showTooltip(equippedShowing ? items[showing].equippedCache : items[showing].cache);
 			}
 		}
 	});
