@@ -341,12 +341,12 @@ function appendUpdates (data) {
 	else {
 		htmlContent += "Pas de changement de guilde récent";
 	}
-	htmlContent += "</div><br /><div class='tga_averageilvl'>";
+	htmlContent += "</div><br />";
 	// Average item level, no more
 	if(data.averageItemLevel) {
-		htmlContent += "Niveau d'objet moyen : " + data.averageItemLevel;
+		htmlContent += "<div class='tga_averageilvl'>Niveau d'objet moyen : " + data.averageItemLevel + "</div><br />";
 	}
-	htmlContent += "</div><br /><div class='tga_missingenchants'>";
+	htmlContent += "<div class='tga_missingenchants'>";
 	// Missing enchants with proper locales
 	if(data.missingEnchants && data.missingEnchants.length > 0) {
 		var missingEnchants = [];
@@ -371,15 +371,15 @@ function appendUpdates (data) {
 	else {
 		htmlContent += "Pas de châsses de gemmes";
 	}
-	htmlContent += "</div><br /><div class='tga_spec'>";
+	htmlContent += "</div><br />";
 	// Spec summary with proper locale
 	if(data.talents.text) {
-		htmlContent += "<a href='" + data.talents.url + "'>Spécialisation (" + data.talents.text + ")</a>";
+		htmlContent += "<div class='tga_spec'><a href='" + data.talents.url + "'>Spécialisation (" + data.talents.text + ")</a>";
 		if(data.talents.dominantTree !== null) {
 			htmlContent += " orientée <i>" + specs[data.class][data.talents.dominantTree] + "</i>";
 		}
+		htmlContent += "</div><br />";
 	}
-	htmlContent += "</div>";
 
 	// append() in case block has data (never seen it)
 	$("table[style^='width:344px;height:190px;background-image:url(img/armory_stats.jpg)'] td:last").first().append(htmlContent).css({"text-align": "left", "padding": "18px", "vertical-align": "top"});
