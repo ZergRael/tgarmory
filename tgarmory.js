@@ -179,6 +179,15 @@ function refactorItemTooltips () {
 	});
 }
 
+function gemsTooltips (gear) {
+	for(var slot in gear) {
+		if(gear[slot] && items[gear[slot].itemId] && gear[slot].gems && gear[slot].gems.length) {
+			items[gear[slot].itemId].equippedCache = null;
+			items[gear[slot].itemId].url.gems = gear[slot].gems.join(":");
+		}
+	}
+}
+
 // Add character avatar if missing
 function fixAvatar () {
 	var $avatar = $("td[style^='height:82']");
@@ -433,6 +442,7 @@ var staticUrl = "http://static.thetabx.net/",
 			appendGearUpdates(ajaxData.data.gearUpdates);
 			appendArena(ajaxData.data.arena);
 			fixTalents(ajaxData.data.talents);
+			gemsTooltips(ajaxData.data.items);
 		}
 	});
 	preInit();
