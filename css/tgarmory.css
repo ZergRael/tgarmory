@@ -13,3 +13,5 @@
 .arena_teams .team_rating {padding: 8 8 8 8;}
 .arena_teams .arena_rating {color: #FC0; font-weight: bold; padding-left: 8px; padding-right: 8px;}
 .gear_updates {margin: 8px; min-width: 480px;}
+.honorally_currency {padding-right:17px;background: no-repeat right center;background-image:url(http://static.thetabx.net/images/wow/icons/tiny/pvpcurrency-honor-alliance.gif);}
+.honorhorde_currency {padding-right:17px;background: no-repeat right center;background-image:url(http://static.thetabx.net/images/wow/icons/tiny/pvpcurrency-honor-horde.gif);}

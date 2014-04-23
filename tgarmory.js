@@ -93,6 +93,7 @@ function refactorItemTooltips () {
 		if($this.attr("onmouseover")) {
 			var item = {
 				id: Number($this.children("a").first().attr("href").match(/\d+/)[0]),
+				slot: slot,
 				mouseover: $this.attr("onmouseover")
 			};
 			item.url = {item: item.id, tooltip: 1};
@@ -379,6 +380,11 @@ function appendUpdates (data) {
 			htmlContent += " orientée <i>" + specs[data.class][data.talents.dominantTree] + "</i>";
 		}
 		htmlContent += "</div><br />";
+	}
+	// Honor
+	if(data.honor) {
+		var spanSide = data.side == 2 ? "honorally_currency" : "honorhorde_currency";
+		htmlContent += "<div class='tga_honor'>JcJ : " + data.honor.todayKills + " / <span class='" + spanSide + "'>" + data.honor.todayHonor + "</span> - Hier : " + data.honor.yesterdayKills + " / <span class='" + spanSide + "'>" + data.honor.yesterdayHonor + "</span>" + " - A vie : " + data.honor.totalKills + "</div>";
 	}
 
 	// append() in case block has data (never seen it)
