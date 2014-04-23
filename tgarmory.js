@@ -76,6 +76,7 @@ var items = {};
 function refactorItemTooltips () {
 	var enchantItemRegex = /<span style=\\"color:#0C0;\\">(?!Equipé|Utilisé|Chance)([^<]+)/,
 		slot = 0,
+		slots = ["head", "neck", "shoulder", "back", "chest", "shirt", "tabard", "wrist", "hands", "waist", "legs", "feet", "finger1", "finger2", "trinket1", "trinket2", "mainHand", "offHand", "ranged"],
 		hovering = false,
 		showing = false,
 		equippedShowing = false,
@@ -93,7 +94,7 @@ function refactorItemTooltips () {
 		if($this.attr("onmouseover")) {
 			var item = {
 				id: Number($this.children("a").first().attr("href").match(/\d+/)[0]),
-				slot: slot,
+				slot: slots[slot],
 				mouseover: $this.attr("onmouseover")
 			};
 			item.url = {item: item.id, tooltip: 1};
@@ -182,7 +183,7 @@ function refactorItemTooltips () {
 
 function gemsTooltips (gear) {
 	for(var slot in gear) {
-		if(gear[slot] && items[gear[slot].itemId] && gear[slot].gems && gear[slot].gems.length) {
+		if(gear[slot] && items[gear[slot].itemId] && items[gear[slot].itemId].slot == slot && gear[slot].gems && gear[slot].gems.length) {
 			items[gear[slot].itemId].equippedCache = null;
 			items[gear[slot].itemId].url.gems = gear[slot].gems.join(":");
 		}
@@ -388,7 +389,7 @@ function appendUpdates (data) {
 	}
 
 	// append() in case block has data (never seen it)
-	$("table[style^='width:344px;height:190px;background-image:url(img/armory_stats.jpg)'] td:last").first().append(htmlContent).css({"text-align": "left", "padding": "18px", "vertical-align": "top"});
+	$("table[style^='width:344px;height:190px;background-image:url(img/armory_stats.jpg)'] td:last").first().append(htmlContent).css({"text-align": "left", "padding": "15px", "vertical-align": "top"});
 }
 
 // Last gear pieces equipped list
