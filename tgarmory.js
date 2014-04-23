@@ -389,7 +389,7 @@ function appendUpdates (data) {
 	}
 
 	// append() in case block has data (never seen it)
-	$("table[style^='width:344px;height:190px;background-image:url(img/armory_stats.jpg)'] td:last").first().append(htmlContent).css({"text-align": "left", "padding": "15px", "vertical-align": "top"});
+	$("table[style^='width:344px;height:190px;background-image:url(img/armory_stats.jpg)'] td:last").first().append(htmlContent).css({"text-align": "left", "padding": "12px", "padding-left": "15px", "vertical-align": "top", "line-height": "1.1em"});
 }
 
 // Last gear pieces equipped list
