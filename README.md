@@ -15,17 +15,22 @@ Pulls data from public proxy api - [Documentation gist](https://gist.github.com/
 * Add last joined/left guild
 * Add average item level
 * Add missing enchants list
+* Add gems on gear
 * Add gem sockets list (still no gems though)
 * Add spec summary with link to talent calc sheet
 * Add last acquired gear pieces
 * Add arena teams, rating and positions
-
-
-### Todo :
-* Find a way to parse gems (unlikely)
+* Add honor and kills
 
 
 ### Changelog :
+**0.2.0**
+* Added gems
+* Added honor and kills
+
+**0.1.3**
+* Improved talent detection
+
 **0.1.2**
 * Fixed ranged weapon missing enchant
 
