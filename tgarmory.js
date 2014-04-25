@@ -122,7 +122,7 @@ function refactorItemTooltips () {
 		var itemId = Number($(this).attr("href").match(/\d+/)[0]),
 			slot = $(this).attr("data_slot"),
 			item = items[itemId];
-		hovering = item;
+		hovering = itemId;
 		if(item && (slot ? item.equippedCache : item.cache)) {
 			// Show cached item tooltip if available
 			showing = item.id;
@@ -138,15 +138,15 @@ function refactorItemTooltips () {
 			if(!item) {
 				// It's an item we haven't parsed, just build it
 				item = {id: itemId, slot: slot, url: {item: itemId, tooltip: 1}};
-				items[item] = item;
+				items[itemId] = item;
 			}
 			// Allow #curseur to follow mouse even before data is ready
 			// Else, tooltip may be stuck on last hovered item
 			prepTooltip();
-			getData(slot ? item.url : {item: itemId, tooltip: 1}, function (data) {
+			getData(item.url, function (data) {
 				if(slot) { item.equippedCache = data; }
 				else { item.cache = data; }
-				if(hovering == item) {
+				if(hovering == item.id) {
 					if(isOriginalTooltip && item.originalTooltip) {
 						showTooltip(item.originalTooltip);
 					}
