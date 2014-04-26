@@ -15,3 +15,9 @@
 .gear_updates {margin: 8px; min-width: 480px;}
 .honorally_currency {padding-right: 17px; background: no-repeat right center; background-image: url(http://static.thetabx.net/images/wow/icons/tiny/pvpcurrency-honor-alliance.gif);}
 .honorhorde_currency {padding-right: 17px; background: no-repeat right center; background-image: url(http://static.thetabx.net/images/wow/icons/tiny/pvpcurrency-honor-horde.gif);}
+.honorally {padding-left: 18px; background: no-repeat left center; background-image: url(http://static.thetabx.net/images/wow/icons/tiny/pvpcurrency-honor-alliance.gif);}
+.honorhorde {padding-right: 18px; background: no-repeat right center; background-image: url(http://static.thetabx.net/images/wow/icons/tiny/pvpcurrency-honor-horde.gif);}
+.tga_bg_table {float: right; text-align: right; padding-bottom: 12px; padding-right: 60px;}
+.tga_bg_table thead {text-align: center; font-weight: bold;}
+.tga_bg_td {padding-right: 18px; padding-left: 18px;}
+.clearfloat {clear: both;}
