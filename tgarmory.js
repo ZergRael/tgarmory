@@ -30,13 +30,23 @@ function parseUrl () {
 
 // Probably not necessary to encapsulate, looks nicer
 function getData (obj, cb) {
-	$.ajax({
-		url: apiUrl,
-		type: "GET",
-		data: obj,
-		cache: true,
-		success: cb
-	});
+	if(typeof obj == "string") {
+		$.ajax({
+			url: apiUrl + obj,
+			type: "GET",
+			cache: true,
+			success: cb
+		});
+	}
+	else {
+		$.ajax({
+			url: apiUrl,
+			type: "GET",
+			data: obj,
+			cache: true,
+			success: cb
+		});
+	}
 }
 
 // On start functions, mostly css additions and corrections
