@@ -444,30 +444,11 @@ function appendArena (data) {
 	}
 }
 
-function appendPvPStatus (data) {
-	var html = "<table class='tga_bg_table'><thead><tr><td colspan='4'>Etat des champs de bataille</td></tr></thead><tbody>",
-		bgs = {warsong: "Goulet", arathi: "Arathi", alterac: "Alterac", eots: "Oeil"},
-		i = 0;
-	for(var bg in data) {
-		if (i % 2 == 0) { html += "<tr>"; }
-		html += "<td class='tga_bg_td'>" + bgs[bg] + "</td><td><span class='honorally'>" + data[bg].a + "</span> vs <span class='honorhorde'>" + data[bg].h + "</span></td>";
-		if (i % 2 == 1) { html += "</tr>"; }
-		i++;
-	}
-	html += "</tbody></table><div class='clearfloat' />";
-	$("table:nth(1)").find("td:last").prepend(html);
-}
-
 var staticUrl = "http://static.thetabx.net/",
 	apiUrl = "http://api.thetabx.net/tgc/3/";
 (function () {
 	var u = parseUrl();
 	if(!u) { return; } // TGC check
-	getData("bgstatus", function(ajaxData) {
-		if(ajaxData.status == "success") {
-			appendPvPStatus(ajaxData.data);
-		}
-	})
 	if(!u.box || u.box != "armory") { return; } // Armory check
 	if(!u.character || u.character.length === 0 || isNaN(u.character)) { return; } // Char armory check
 	if($("table").length < 10) { return; } // Probably error page
