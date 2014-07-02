@@ -15,6 +15,7 @@
       "matches": ["*://thegeekcrusade-serveur.com/*"],
       "js": [
         "lib/jquery-2.0.3.min.js",
+        "guild_page.js",
         "tgarmory.js"
       ],
       "css": ["css/tgarmory.css"]

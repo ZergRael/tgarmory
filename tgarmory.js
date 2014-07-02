@@ -451,19 +451,27 @@ var staticUrl = "http://static.thetabx.net/",
 	var u = parseUrl();
 	if(!u) { return; } // TGC check
 	if(!u.box || u.box != "armory") { return; } // Armory check
-	if(!u.character || u.character.length === 0 || isNaN(u.character)) { return; } // Char armory check
-	if($("table").length < 10) { return; } // Probably error page
+	if(u.character) {
+		if(u.character.length === 0 || isNaN(u.character)) { return; } // Char armory check
+		if($("table").length < 10) { return; } // Probably error page
 
-	getData({"char": u.character}, function(ajaxData) {
-		if(ajaxData.status == "success") {
-			appendUpdates(ajaxData.data);
-			appendGearUpdates(ajaxData.data.gearUpdates);
-			appendArena(ajaxData.data.arena);
-			fixTalents(ajaxData.data.talents);
-			gemsTooltips(ajaxData.data.items);
-		}
-	});
-	preInit();
-	fixAvatar();
-	refactorItemTooltips();
+		getData({"char": u.character}, function(ajaxData) {
+			if(ajaxData.status == "success") {
+				appendUpdates(ajaxData.data);
+				appendGearUpdates(ajaxData.data.gearUpdates);
+				appendArena(ajaxData.data.arena);
+				fixTalents(ajaxData.data.talents);
+				gemsTooltips(ajaxData.data.items);
+			}
+		});
+		preInit();
+		fixAvatar();
+		refactorItemTooltips();
+	}
+	else if(u.guild) {
+		if(u.guild.length === 0 || isNaN(u.guild)) { return; } // Guild armory check
+		if($("table").length > 10) { return; } // Probably real page
+
+		buildGuildPage(u.guild);
+	}
 })();
