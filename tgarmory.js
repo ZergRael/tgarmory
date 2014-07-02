@@ -86,10 +86,8 @@ var items = {};
 function refactorItemTooltips () {
 	var enchantItemRegex = /<span style=\\"color:#0C0;\\">(?!Equipé|Utilisé|Chance)([^<]+)/,
 		slot = 0,
-		slots = ["head", "neck", "shoulder", "back", "chest", "shirt", "tabard", "wrist", "hands", "waist", "legs", "feet", "finger1", "finger2", "trinket1", "trinket2", "mainHand", "offHand", "ranged"],
 		hovering = false,
 		showing = false,
-		equippedShowing = false,
 		isOriginalTooltip = false;
 	$("td[onmouseover], td[style^='width:32px;;']").each(function () {
 		var $this = $(this);
@@ -104,9 +102,10 @@ function refactorItemTooltips () {
 		if($this.attr("onmouseover")) {
 			var item = {
 				id: Number($this.children("a").first().attr("href").match(/\d+/)[0]),
-				slot: slots[slot],
+				slot: slot,
 				mouseover: $this.attr("onmouseover")
 			};
+			item.hash = item.id + "_" + item.slot;
 			item.url = {item: item.id, tooltip: 1};
 
 			if(item.mouseover) {
@@ -120,7 +119,7 @@ function refactorItemTooltips () {
 				item.originalTooltip = item.mouseover.substring(8, item.mouseover.length - 3).replace(/\\"/g, "\"");
 				$this.removeAttr("onmouseover").removeAttr("onmouseout").children("a").attr("data_slot", slot);
 			}
-			items[item.id] = item;
+			items[item.hash] = item;
 		}
 		slot++;
 	}).parent().each(function() {
@@ -131,40 +130,38 @@ function refactorItemTooltips () {
 	$(document).on("mouseenter", "a[href^='index.php?box=armory&item']", function() {
 		var itemId = Number($(this).attr("href").match(/\d+/)[0]),
 			slot = $(this).attr("data_slot"),
-			item = items[itemId];
-		hovering = itemId;
-		if(item && (slot ? item.equippedCache : item.cache)) {
+			hash = itemId + (slot ? "_" + slot : ""),
+			item = items[hash];
+		hovering = hash;
+		if(item && item.cache) {
 			// Show cached item tooltip if available
-			showing = item.id;
-			equippedShowing = !!slot;
+			showing = item.hash;
 			if(isOriginalTooltip && item.originalTooltip) {
 				showTooltip(item.originalTooltip);
 			}
 			else {
-				showTooltip(slot ? item.equippedCache : item.cache);
+				showTooltip(item.cache);
 			}
 		}
 		else {
 			if(!item) {
 				// It's an item we haven't parsed, just build it
-				item = {id: itemId, slot: slot, url: {item: itemId, tooltip: 1}};
-				items[itemId] = item;
+				item = {id: itemId, hash: hash, url: {item: itemId, tooltip: 1}};
+				items[item.hash] = item;
 			}
 			// Allow #curseur to follow mouse even before data is ready
 			// Else, tooltip may be stuck on last hovered item
 			prepTooltip();
 			getData(item.url, function (data) {
-				if(slot) { item.equippedCache = data; }
-				else { item.cache = data; }
-				if(hovering == item.id) {
+				item.cache = data;
+				if(hovering == item.hash) {
 					if(isOriginalTooltip && item.originalTooltip) {
 						showTooltip(item.originalTooltip);
 					}
 					else {
 						showTooltip(data);
 					}
-					showing = item.id;
-					equippedShowing = !!slot;
+					showing = item.hash;
 				}
 			});
 		}
@@ -185,17 +182,21 @@ function refactorItemTooltips () {
 		else if(e.type == "keyup") {
 			isOriginalTooltip = false;
 			if(showing) {
-				showTooltip(equippedShowing ? items[showing].equippedCache : items[showing].cache);
+				showTooltip(items[showing].cache);
 			}
 		}
 	});
 }
 
 function gemsTooltips (gear) {
+	var slots = ["head", "neck", "shoulder", "back", "chest", "shirt", "tabard", "wrist", "hands", "waist", "legs", "feet", "finger1", "finger2", "trinket1", "trinket2", "mainHand", "offHand", "ranged"];
 	for(var slot in gear) {
-		if(gear[slot] && items[gear[slot].itemId] && items[gear[slot].itemId].slot == slot && gear[slot].gems && gear[slot].gems.length) {
-			items[gear[slot].itemId].equippedCache = null;
-			items[gear[slot].itemId].url.gems = gear[slot].gems.join(":");
+		if(!gear[slot]) { continue; }
+		var numSlot = slots.indexOf(slot),
+			itemHash = gear[slot].itemId + "_" + numSlot;
+		if(items[itemHash] && items[itemHash].slot == numSlot && gear[slot].gems && gear[slot].gems.length) {
+			items[itemHash].cache = null;
+			items[itemHash].url.gems = gear[slot].gems.join(":");
 		}
 	}
 }
