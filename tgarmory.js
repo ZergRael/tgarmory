@@ -233,7 +233,6 @@ function fixTalents (talents) {
 				talents.trees[treeN][rowN].push({p: p, mP: mP, node: $(this).find("strong").first()});
 			});
 			if (rowPoints > 0 && rowN > 0 && (1.0 * talents.perTree[treeN] / rowN) < 5.0) {
-				//console.log("Missing points for this row [" + treeN + "][" + rowN + "]");
 				var fixedTree = false;
 				for(var row = rowN - 1; row >= 0; row--) {
 					for(var i = 0; i < talents.trees[treeN][row].length; i++) {
@@ -261,7 +260,6 @@ function fixTalents (talents) {
 	if(talents.total == level - 10) {
 		for(var treeN = 0; treeN < talents.trees.length; treeN++) {
 			if(talents.perTree[treeN] >= 40) {
-				//console.log("Missing last point with talents.total < 61");
 				talents.total += 1;
 				talents.perTree[treeN] += 1;
 				talents.perRow[treeN][talents.perRow[treeN].length - 1] += 1;
