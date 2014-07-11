@@ -18,18 +18,22 @@ var cache = {},
 	apiUrl = "http://api.thetabx.net/tgc/3/";
 
 // Format url into params hash
-function parseUrl () {
-	if(window.location.host != "thegeekcrusade-serveur.com") { return false; }
-	var search = window.location.search;
-	if(search.length === 0 || search[0] != "?") { return {}; }
-	var params = search.substring(1).split("&");
-	var keyValues = {};
+function parseUrl (url) {
+	var u = { p: {} },
+		urlMatch = url.match(/(https?:\/\/[^\/]+)?(\/?[^\?]*)(\?.*)?/);
+	if(!urlMatch) { return false; }
+	u.host = urlMatch[1] || window.location.origin;
+	u.path = urlMatch[2];
+	u.search = urlMatch[3];
+
+	if(!u.search) { return u; }
+	var params = u.search.substring(1).split("&");
 	for(var i in params) {
 		var kv = params[i].split("=");
 		if(kv.length != 2) { continue; }
-		keyValues[kv[0]] = kv[1];
+		u.p[kv[0]] = kv[1];
 	}
-	return keyValues;
+	return u;
 }
 
 // Probably not necessary to encapsulate, looks nicer
@@ -446,31 +450,86 @@ function appendArena (data) {
 	}
 }
 
-(function () {
-	var u = parseUrl();
-	if(!u) { return; } // TGC check
-	if(!u.box || u.box != "armory") { return; } // Armory check
-	if(u.character) {
-		if(u.character.length === 0 || isNaN(u.character)) { return; } // Char armory check
-		if($("table").length < 10) { return; } // Probably error page
-
-		getData({"char": u.character}, function(ajaxData) {
-			if(ajaxData.status == "success") {
-				appendUpdates(ajaxData.data);
-				appendGearUpdates(ajaxData.data.gearUpdates);
-				appendArena(ajaxData.data.arena);
-				fixTalents(ajaxData.data.talents);
-				gemsTooltips(ajaxData.data.items);
+function appendTooltips () {
+	var showing = false,
+		hovering = false;
+	$(document).on("mouseenter mouseleave", "a[href*=spell\\=], a[href*=item\\=]", function(e) {
+		if(e.type == "mouseenter") {
+			var objMatch = $(this).attr("href").match(/(item|spell)=(\d+)/);
+			if(!objMatch || !objMatch[1] || !objMatch[2]) { return ; }
+			var objId = objMatch[2],
+				prefix = false;
+			switch(objMatch[1]) {
+				case "item": prefix = "i";
+					break;
+				case "spell": prefix = "s";
+					break;
 			}
-		});
-		preInit();
-		fixAvatar();
-		refactorItemTooltips();
-	}
-	else if(u.guild) {
-		if(u.guild.length === 0 || isNaN(u.guild)) { return; } // Guild armory check
-		if($("table").length > 10) { return; } // Probably real page
+			if(!prefix) { return; }
 
-		buildGuildPage(u.guild);
+			var hash = prefix + objId,
+				obj = cache[hash];
+			hovering = hash;
+			if(obj && obj.cache) {
+				showing = obj.hash;
+				showTooltip(obj.cache);
+			}
+			else {
+				if(!obj) {
+					obj = {id: objId, hash: hash, url: {tooltip: 1}};
+					obj.url[objMatch[1]] = objId;
+					cache[obj.hash] = obj;
+				}
+				prepTooltip();
+				getData(obj.url, function (data) {
+					obj.cache = data;
+					if(hovering == obj.hash) {
+						showTooltip(obj.cache);
+						showing = obj.hash;
+					}
+				});
+			}
+		}
+		else {
+			showing = false;
+			hovering = false;
+			hideTooltip();
+		}
+	});
+}
+
+(function () {
+	if(window.location.host != "thegeekcrusade-serveur.com") { return; }
+
+	var u = parseUrl(window.location.href);
+	if(!u) { return; }
+
+	preInit();
+	if(u.p.box && u.p.box == "armory") {
+		if(u.p.character) {
+			if(u.p.character.length === 0 || isNaN(u.p.character)) { return; } // Char armory check
+			if($("table").length < 10) { return; } // Probably error page
+
+			getData({"char": u.character}, function(ajaxData) {
+				if(ajaxData.status == "success") {
+					appendUpdates(ajaxData.data);
+					appendGearUpdates(ajaxData.data.gearUpdates);
+					appendArena(ajaxData.data.arena);
+					fixTalents(ajaxData.data.talents);
+					gemsTooltips(ajaxData.data.items);
+				}
+			});
+			fixAvatar();
+			refactorItemTooltips();
+		}
+		else if(u.p.guild) {
+			if(u.p.guild.length === 0 || isNaN(u.p.guild)) { return; } // Guild armory check
+			if($("table").length > 10) { return; } // Probably real page
+
+			buildGuildPage(u.p.guild);
+		}
+	}
+	else {
+		appendTooltips();
 	}
 })();
