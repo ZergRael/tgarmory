@@ -13,6 +13,10 @@ if(typeof chrome == "undefined") {
 	};
 }
 
+var cache = {},
+	staticUrl = "http://static.thetabx.net/",
+	apiUrl = "http://api.thetabx.net/tgc/3/";
+
 // Format url into params hash
 function parseUrl () {
 	if(window.location.host != "thegeekcrusade-serveur.com") { return false; }
@@ -82,7 +86,6 @@ function hideTooltip () {
 	$("#curseur").css("visibility", "hidden").children().hide();
 }
 // Extract tooltips, reformat them to nicer wowhead like tooltips
-var items = {};
 function refactorItemTooltips () {
 	var enchantItemRegex = /<span style=\\"color:#0C0;\\">(?!Equipé|Utilisé|Chance)([^<]+)/,
 		slot = 0,
@@ -105,7 +108,7 @@ function refactorItemTooltips () {
 				slot: slot,
 				mouseover: $this.attr("onmouseover")
 			};
-			item.hash = item.id + "_" + item.slot;
+			item.hash = "i" + item.id + "_" + item.slot;
 			item.url = {item: item.id, tooltip: 1};
 
 			if(item.mouseover) {
@@ -119,7 +122,7 @@ function refactorItemTooltips () {
 				item.originalTooltip = item.mouseover.substring(8, item.mouseover.length - 3).replace(/\\"/g, "\"");
 				$this.removeAttr("onmouseover").removeAttr("onmouseout").children("a").attr("data_slot", slot);
 			}
-			items[item.hash] = item;
+			cache[item.hash] = item;
 		}
 		slot++;
 	}).parent().each(function() {
@@ -130,8 +133,8 @@ function refactorItemTooltips () {
 	$(document).on("mouseenter", "a[href^='index.php?box=armory&item']", function() {
 		var itemId = Number($(this).attr("href").match(/\d+/)[0]),
 			slot = $(this).attr("data_slot"),
-			hash = itemId + (slot ? "_" + slot : ""),
-			item = items[hash];
+			hash = "i" + itemId + (slot ? "_" + slot : ""),
+			item = cache[hash];
 		hovering = hash;
 		if(item && item.cache) {
 			// Show cached item tooltip if available
@@ -147,7 +150,7 @@ function refactorItemTooltips () {
 			if(!item) {
 				// It's an item we haven't parsed, just build it
 				item = {id: itemId, hash: hash, url: {item: itemId, tooltip: 1}};
-				items[item.hash] = item;
+				cache[item.hash] = item;
 			}
 			// Allow #curseur to follow mouse even before data is ready
 			// Else, tooltip may be stuck on last hovered item
@@ -174,15 +177,15 @@ function refactorItemTooltips () {
 		if(e.which != 17) { return; }
 		// Toggle between new and original tooltip
 		if(e.type == "keydown") {
-			if(showing && !isOriginalTooltip && items[showing].originalTooltip) {
+			if(showing && !isOriginalTooltip && cache[showing].originalTooltip) {
 				isOriginalTooltip = true;
-				showTooltip(items[showing].originalTooltip);
+				showTooltip(cache[showing].originalTooltip);
 			}
 		}
 		else if(e.type == "keyup") {
 			isOriginalTooltip = false;
 			if(showing) {
-				showTooltip(items[showing].cache);
+				showTooltip(cache[showing].cache);
 			}
 		}
 	});
@@ -193,10 +196,10 @@ function gemsTooltips (gear) {
 	for(var slot in gear) {
 		if(!gear[slot]) { continue; }
 		var numSlot = slots.indexOf(slot),
-			itemHash = gear[slot].itemId + "_" + numSlot;
-		if(items[itemHash] && items[itemHash].slot == numSlot && gear[slot].gems && gear[slot].gems.length) {
-			items[itemHash].cache = null;
-			items[itemHash].url.gems = gear[slot].gems.join(":");
+			itemHash = "i" + gear[slot].itemId + "_" + numSlot;
+		if(cache[itemHash] && cache[itemHash].slot == numSlot && gear[slot].gems && gear[slot].gems.length) {
+			cache[itemHash].cache = null;
+			cache[itemHash].url.gems = gear[slot].gems.join(":");
 		}
 	}
 }
@@ -443,8 +446,6 @@ function appendArena (data) {
 	}
 }
 
-var staticUrl = "http://static.thetabx.net/",
-	apiUrl = "http://api.thetabx.net/tgc/3/";
 (function () {
 	var u = parseUrl();
 	if(!u) { return; } // TGC check
