@@ -12,6 +12,7 @@ Pulls data from public proxy api - [Documentation gist](https://gist.github.com/
 * Fix items pictures positions on Chrome
 * Fix avatar picture with some races
 * Fix missing talent points
+* Add items & spells tooltips everywhere
 * Add last joined/left guild
 * Add average item level
 * Add missing enchants list
@@ -24,7 +25,13 @@ Pulls data from public proxy api - [Documentation gist](https://gist.github.com/
 
 
 ### Changelog :
-**0.2.0**
+**0.2.3**
+* Armory display quickfix
+
+**0.2.2**
+* Added items & spells tooltips everywhere
+
+**0.2.1**
 * Added gems
 * Added honor and kills
 

@@ -476,8 +476,9 @@ function appendTooltips () {
 			}
 			else {
 				if(!obj) {
-					obj = {id: objId, hash: hash, url: {tooltip: 1}};
+					obj = {id: objId, hash: hash, url: {}};
 					obj.url[objMatch[1]] = objId;
+					obj.url.tooltip = 1;
 					cache[obj.hash] = obj;
 				}
 				prepTooltip();
@@ -510,7 +511,7 @@ function appendTooltips () {
 			if(u.p.character.length === 0 || isNaN(u.p.character)) { return; } // Char armory check
 			if($("table").length < 10) { return; } // Probably error page
 
-			getData({"char": u.character}, function(ajaxData) {
+			getData({"char": u.p.character}, function(ajaxData) {
 				if(ajaxData.status == "success") {
 					appendUpdates(ajaxData.data);
 					appendGearUpdates(ajaxData.data.gearUpdates);
