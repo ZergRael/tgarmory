@@ -25,7 +25,7 @@ Pulls data from public proxy api - [Documentation gist](https://gist.github.com/
 
 
 ### Changelog :
-**0.2.3**
+**0.2.4**
 * Armory display quickfix
 
 **0.2.2**
