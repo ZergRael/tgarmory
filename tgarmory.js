@@ -220,19 +220,19 @@ function fixAvatar () {
 }
 
 // Try to correct talent trees
-function fixTalents (talents) {
-	var level = Number($("span[style^='color:#fcd20c;']").text().match(/\d+/))
+function fixTalents () { // (talents) {
+	var level = Number($("span[style^='color:#fcd20c;']").text().match(/\d+/)),
 		talents = {total: 0, perTree: [0,0,0], perRow: [[], [], []], trees: [[], [], []]};
 	if(!level || level < 70) { return; }
 	var $trees = $("table.cursor>tbody>tr>td>center>table:nth-child(3n+2)");
 
 	// Discover trees and fix internal errors
 	$trees.each(function(treeN) {
-		if ($(this).find("tr").length == 0) {return;}
+		if ($(this).find("tr").length === 0) { return; }
 		$(this).find("tr").each(function(rowN) {
-			if ($(this).find("td").length == 0) {return;}
+			if ($(this).find("td").length === 0) { return; }
 			var rowPoints = 0;
-			$(this).find("td.cursor").each(function(colN) {
+			$(this).find("td.cursor").each(function() {
 				var actualPoints = $(this).find("strong").first().text().match(/(\d)\/(\d)/);
 				var p = Number(actualPoints[1]), mP = Number(actualPoints[2]);
 				rowPoints += p;
@@ -244,7 +244,7 @@ function fixTalents (talents) {
 				for(var row = rowN - 1; row >= 0; row--) {
 					for(var i = 0; i < talents.trees[treeN][row].length; i++) {
 						var t = talents.trees[treeN][row][i];
-						if(t.mP == 1 && t.p == 0) {
+						if(t.mP == 1 && t.p === 0) {
 							t.p = 1;
 							t.node.text(t.p + "/" + t.mP);
 							talents.total += t.p;
@@ -283,7 +283,7 @@ function fixTalents (talents) {
 		for(var treeN = 0; treeN < talents.trees.length; treeN++) {
 			for(var rowN = 0; rowN < talents.trees[treeN].length; rowN++) {
 				for(var colN = 0; colN < talents.trees[treeN][rowN].length; colN++) {
-					if(talents.trees[treeN][rowN][colN].p == 0) {
+					if(talents.trees[treeN][rowN][colN].p === 0) {
 						talents.trees[treeN][rowN][colN].node.css("color", "#999");
 					}
 					else {
@@ -298,7 +298,6 @@ function fixTalents (talents) {
 	$("table.cursor>tbody>tr>td>center>table:nth-child(3n)").each(function(treeN) {
 		$(this).find("span").first().text(talents.perTree[treeN]);
 	});
-	//console.log(talents);
 }
 
 // Not beautiful, still needed. sprintf, where are you ?
@@ -456,7 +455,7 @@ function appendTooltips () {
 	$(document).on("mouseenter mouseleave", "a[href*=spell\\=], a[href*=item\\=]", function(e) {
 		if(e.type == "mouseenter") {
 			var objMatch = $(this).attr("href").match(/(item|spell)=(\d+)/);
-			if(!objMatch || !objMatch[1] || !objMatch[2]) { return ; }
+			if(!objMatch || !objMatch[1] || !objMatch[2]) { return; }
 			var objId = objMatch[2],
 				prefix = false;
 			switch(objMatch[1]) {

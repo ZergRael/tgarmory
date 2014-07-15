@@ -12,5 +12,5 @@ function buildGuildPage (guildId) {
 			html = buildGuildContent(ajaxData.data);
 		}
 		$("table:nth(5) tr:nth(1) td").html(html);
-	})
+	});
 }
