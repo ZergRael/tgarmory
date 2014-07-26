@@ -7,7 +7,7 @@ function buildGuildContent (guild) {
 
 function buildGuildPage (guildId) {
 	var html = "nope";
-	getData({guild: guildId}, function(ajaxData) {
+	getData({data: {guild: guildId}}, function(ajaxData) {
 		if(ajaxData && ajaxData.status == "success") {
 			html = buildGuildContent(ajaxData.data);
 		}

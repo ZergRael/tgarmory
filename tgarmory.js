@@ -38,24 +38,14 @@ function parseUrl (url) {
 }
 
 // Probably not necessary to encapsulate, looks nicer
-function getData (obj, cb) {
-	if(typeof obj == "string") {
-		$.ajax({
-			url: apiUrl + obj,
-			type: "GET",
-			cache: true,
-			success: cb
-		});
-	}
-	else {
-		$.ajax({
-			url: apiUrl,
-			type: "GET",
-			data: obj,
-			cache: true,
-			success: cb
-		});
-	}
+function getData (o, cb) {
+	$.ajax({
+		url: apiUrl + (o.url || ""),
+		type: "GET",
+		data: o.data || {},
+		cache: true,
+		success: cb
+	});
 }
 
 // Storage
@@ -168,7 +158,7 @@ function refactorItemTooltips () {
 			// Allow #curseur to follow mouse even before data is ready
 			// Else, tooltip may be stuck on last hovered item
 			prepTooltip();
-			getData(item.url, function (data) {
+			getData({data: item.url}, function (data) {
 				item.cache = data;
 				if(hovering == item.hash) {
 					if(isOriginalTooltip && item.originalTooltip) {
@@ -490,7 +480,7 @@ function appendTooltips () {
 					cache[obj.hash] = obj;
 				}
 				prepTooltip();
-				getData(obj.url, function (data) {
+				getData({data: obj.url}, function (data) {
 					obj.cache = data;
 					if(hovering == obj.hash) {
 						showTooltip(obj.cache);
@@ -527,7 +517,7 @@ function updateDB () {
 			if(u.p.character.length === 0 || isNaN(u.p.character)) { return; } // Char armory check
 			if($("table").length < 10) { return; } // Probably error page
 
-			getData({"char": u.p.character}, function(ajaxData) {
+			getData({data: {"char": u.p.character}}, function(ajaxData) {
 				if(ajaxData.status == "success") {
 					appendUpdates(ajaxData.data);
 					appendGearUpdates(ajaxData.data.gearUpdates);
