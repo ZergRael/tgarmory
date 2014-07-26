@@ -15,7 +15,8 @@ if(typeof chrome == "undefined") {
 
 var cache = {},
 	staticUrl = "http://static.thetabx.net/",
-	apiUrl = "http://api.thetabx.net/tgc/3/";
+	apiUrl = "http://api.thetabx.net/tgc/3/",
+	DB_VERSION = 1;
 
 // Format url into params hash
 function parseUrl (url) {
@@ -55,6 +56,14 @@ function getData (obj, cb) {
 			success: cb
 		});
 	}
+}
+
+// Storage
+function _save (key, obj) {
+	localStorage.setItem("tga_" + key, JSON.stringify(obj));
+}
+function _load (key) {
+	return JSON.parse(localStorage.getItem("tga_" + key));
 }
 
 // On start functions, mostly css additions and corrections
@@ -498,6 +507,13 @@ function appendTooltips () {
 	});
 }
 
+function updateDB () {
+	var dbVer = _load("dbversion");
+	if (!dbVer) {
+		_save("dbversion", DB_VERSION);
+	}
+}
+
 (function () {
 	if(window.location.host != "thegeekcrusade-serveur.com") { return; }
 
@@ -505,6 +521,7 @@ function appendTooltips () {
 	if(!u) { return; }
 
 	preInit();
+	updateDB();
 	if(u.p.box && u.p.box == "armory") {
 		if(u.p.character) {
 			if(u.p.character.length === 0 || isNaN(u.p.character)) { return; } // Char armory check
