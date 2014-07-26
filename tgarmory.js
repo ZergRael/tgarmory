@@ -497,6 +497,67 @@ function appendTooltips () {
 	});
 }
 
+function buildGuildLinks () {
+	var $guilds = $("span[style='color:#fff; font-size:11px;'], td[style='padding-top:8px;padding-bottom:6px; font-size:9px; padding-left:4px;text-align:center'], p[style='font:0.9em Arial, sans-serif ; line-height:1em;color:;margin:0px; padding:0px;']"),
+		guilds = {};
+
+	if($guilds.length == 0) { return; }
+
+	$guilds.each(function() {
+		var bName = $(this).text().trim()
+		if(bName == "") { return; }
+		var name = bName.substring(1, bName.length - 1);
+		if(guilds[name]) {
+			guilds[name].nodes.push($(this));
+		}
+		else {
+			guilds[name] = {bName: bName , nodes: [$(this)]};
+		}
+	});
+
+	var savedGuilds = _load("guilds") || {},
+		fetchTheses = [];
+
+	for(var name in guilds) {
+		if(!savedGuilds[name]) {
+			guilds[name].fetch = true;
+			fetchTheses.push(name);
+		}
+		else {
+			guilds[name].id = savedGuilds[name];
+		}
+	}
+
+	if(fetchTheses.length) {
+		getData({url: "search/guild", data: {q: fetchTheses}}, function(data) {
+			if (data.status == "success" && data.data.count > 0) {
+				for(var i in data.data.results) {
+					var g = data.data.results[i];
+					if(guilds[g.name]) {
+						guilds[g.name].id = g.id;
+						savedGuilds[g.name] = g.id;
+					}
+				}
+				_save("guilds", savedGuilds);
+			}
+			addGuildLinks(guilds);
+		})
+	}
+	else {
+		addGuildLinks(guilds);
+	}
+}
+
+function addGuildLinks (guilds) {
+	for(var name in guilds) {
+		if(guilds[name].id) {
+			for(var n in guilds[name].nodes) {
+				guilds[name].nodes[n].wrapInner('<a href="/index.php?box=armory&guild=' + guilds[name].id + '">');
+			}
+		}
+	}
+}
+
 function updateDB () {
 	var dbVer = _load("dbversion");
 	if (!dbVer) {
@@ -539,4 +600,5 @@ function updateDB () {
 	else {
 		appendTooltips();
 	}
+	buildGuildLinks();
 })();
