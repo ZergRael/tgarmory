@@ -594,7 +594,8 @@ function updateDB () {
 			if(u.p.guild.length === 0 || isNaN(u.p.guild)) { return; } // Guild armory check
 			if($("table").length > 10) { return; } // Probably real page
 
-			buildGuildPage(u.p.guild);
+			createGuildPage(u.p.guild);
+			appendTooltips();
 		}
 	}
 	else {
