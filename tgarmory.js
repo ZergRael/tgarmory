@@ -498,7 +498,7 @@ function appendTooltips () {
 }
 
 function buildGuildLinks () {
-	var $guilds = $("span[style='color:#fff; font-size:11px;'], td[style='padding-top:8px;padding-bottom:6px; font-size:9px; padding-left:4px;text-align:center'], p[style='font:0.9em Arial, sans-serif ; line-height:1em;color:;margin:0px; padding:0px;']"),
+	var $guilds = $("span[style='color:#fff; font-size:11px;'], td[style='padding-top:8px;padding-bottom:6px; font-size:9px; padding-left:4px;text-align:center'], p[style='font:0.9em Arial, sans-serif ; line-height:1em;color:;margin:0px; padding:0px;'], td[style=' width:200px;height:50px;font-size:22px; color:#b4e718;padding-top:26px;  vertical-align:top; font-family:frizquadratatt;'] strong, td[style='width:300px;'][align='center'].armory_search_header_td"),
 		guilds = {};
 
 	if($guilds.length == 0) { return; }
@@ -506,7 +506,7 @@ function buildGuildLinks () {
 	$guilds.each(function() {
 		var bName = $(this).text().trim()
 		if(bName == "") { return; }
-		var name = bName.substring(1, bName.length - 1);
+		var name = bName.indexOf("<") == -1 ? bName : bName.substring(1, bName.length - 1);
 		if(guilds[name]) {
 			guilds[name].nodes.push($(this));
 		}
