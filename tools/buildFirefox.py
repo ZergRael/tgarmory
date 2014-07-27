@@ -86,7 +86,7 @@ def run():
 	#	distutils.file_util.copy_file("gksimproved.xpi", os.path.join("..", chromeDir, "build", "gksimproved.mobile.xpi"))
 
 	try :
-		cuddlefish.run(["--update-url", "https://thetabx.net/addon/tga/checkfirefoxupdate/%APP_OS%/%CURRENT_APP_VERSION%/%ITEM_VERSION%/", "xpi"])
+		cuddlefish.run(["--update-url", "https://thetabx.net/addon/tga/firefox/%APP_OS%/%CURRENT_APP_VERSION%/%ITEM_VERSION%/", "xpi"])
 	except SystemExit:
 		print("Copy .xpi")
 		distutils.file_util.copy_file("tgarmory.xpi", os.path.join("..", chromeDir, "build"))
