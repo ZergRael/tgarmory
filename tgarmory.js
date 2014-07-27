@@ -306,7 +306,7 @@ function dateToString (date, full) {
 
 // Create a table with proper borders
 function buildFrame (className, content) {
-	return "<table class='tga_frame " + className + "'><tbody><tr><td>" + content + "</td><th style='background-position: top right;'></th></tr><tr><th style='background-position: bottom left;'></th><th style='background-position: bottom right;'></th></tr></tbody></table>";
+	return "<table class='tga_frame " + className + "'><tbody><tr><td class='tga_frame_content'>" + content + "</td><th style='background-position: top right;'></th></tr><tr><th style='background-position: bottom left;'></th><th style='background-position: bottom right;'></th></tr></tbody></table>";
 }
 
 // Buttload of updates on character
