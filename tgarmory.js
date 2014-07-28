@@ -504,9 +504,10 @@ function buildGuildLinks () {
 	if($guilds.length == 0) { return; }
 
 	$guilds.each(function() {
-		var bName = $(this).text().trim()
+		var bName = $(this).text().trim();
 		if(bName == "") { return; }
 		var name = bName.indexOf("<") == -1 ? bName : bName.substring(1, bName.length - 1);
+		if(name == "Pas-de-Personnage") { return; }
 		if(guilds[name]) {
 			guilds[name].nodes.push($(this));
 		}
