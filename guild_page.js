@@ -1,4 +1,4 @@
-/*global $:false, i:true, self:false*/
+/*global $:false, buildFrame:false, getData:false, dateToString:false, staticUrl:false*/
 "use strict";
 
 function buildGuildPage () {
@@ -64,13 +64,12 @@ function fillGuildPage (guild) {
 
 	// Frame contents
 	if(guild.desc) { detailsHtml.push(guild.desc); }
-	if(guild.url) { detailsHtml.push('<a href="' + guild.url + '">' + guild.url + '</a>'); }
+	if(guild.url) { detailsHtml.push("<a href=\"" + guild.url + "\">" + guild.url + "</a>"); }
 	if(guild.displayedMembersCount) { detailsHtml.push((detailsHtml.length ? "<br />" : "") + guild.displayedMembersCount + " membres"); }
-	if(guild.progressText) { detailsHtml.push('<a href="/index.php?box=pve">Progression : ' + guild.progressText + '</a>'); }
+	if(guild.progressText) { detailsHtml.push("<a href=\"/index.php?box=pve\">Progression : " + guild.progressText + "</a>"); }
 	if(guild.creationTimestamp) { detailsHtml.push("Guilde créée le " + dateToString(new Date(guild.creationTimestamp * 1000))); }
-	console.log(detailsHtml);
 	if(!detailsHtml.length) {
-		detailsHtml.push("Cette guilde n'est actuellement pas présente dans le <a href=\"/index.php?box=pve\">classement PVE</a>.<br /><br />Les informations de guilde ainsi que les derniers downs ne seront donc pas affichés.")
+		detailsHtml.push("Cette guilde n'est actuellement pas présente dans le <a href=\"/index.php?box=pve\">classement PVE</a>.<br /><br />Les informations de guilde ainsi que les derniers downs ne seront donc pas affichés.");
 	}
 	$(".armory_frame .tga_frame_content").html(detailsHtml.join("<br />"));
 
@@ -85,7 +84,7 @@ function fillGuildPage (guild) {
 			$("<td>", {class: "small_col", text: member.level}),
 			$("<td>", {class: "small_col"}).append($("<img>", {src: "img/race-" + member.race + ".gif"})),
 			$("<td>", {class: "small_col"}).append($("<img>", {src: "img/class-" + member.class + ".gif"})),
-			$("<td>", {class: "small_col"}).append(member.spec != null ? $("<img>", {src: staticUrl + "images/wow/armory/spec/small/" + member.class + "-" + member.spec + ".jpg"}) : ""),
+			$("<td>", {class: "small_col"}).append(member.spec !== null ? $("<img>", {src: staticUrl + "images/wow/armory/spec/small/" + member.class + "-" + member.spec + ".jpg"}) : ""),
 			$("<td>", {class: "hmed_col centered", text: member.lastAct > 0 ? dateToString(new Date(member.lastAct * 1000), true) : ""})
 		));
 	}

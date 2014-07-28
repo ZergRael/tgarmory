@@ -1,4 +1,4 @@
-/*global $:false, i:true, self:false*/
+/*global $:false, i:true, self:false, createGuildPage:false*/
 "use strict";
 
 // Hacks to simulate chrome APIs
@@ -501,11 +501,11 @@ function buildGuildLinks () {
 	var $guilds = $("span[style='color:#fff; font-size:11px;'], td[style='padding-top:8px;padding-bottom:6px; font-size:9px; padding-left:4px;text-align:center'], p[style='font:0.9em Arial, sans-serif ; line-height:1em;color:;margin:0px; padding:0px;'], td[style=' width:200px;height:50px;font-size:22px; color:#b4e718;padding-top:26px;  vertical-align:top; font-family:frizquadratatt;'] strong, td[style='width:300px;'][align='center'].armory_search_header_td"),
 		guilds = {};
 
-	if($guilds.length == 0) { return; }
+	if($guilds.length === 0) { return; }
 
 	$guilds.each(function() {
 		var bName = $(this).text().trim();
-		if(bName == "") { return; }
+		if(bName === "") { return; }
 		var name = bName.indexOf("<") == -1 ? bName : bName.substring(1, bName.length - 1);
 		if(name == "Pas-de-Personnage") { return; }
 		if(guilds[name]) {
@@ -542,7 +542,7 @@ function buildGuildLinks () {
 				_save("guilds", savedGuilds);
 			}
 			addGuildLinks(guilds);
-		})
+		});
 	}
 	else {
 		addGuildLinks(guilds);
@@ -553,7 +553,7 @@ function addGuildLinks (guilds) {
 	for(var name in guilds) {
 		if(guilds[name].id) {
 			for(var n in guilds[name].nodes) {
-				guilds[name].nodes[n].wrapInner('<a href="/index.php?box=armory&guild=' + guilds[name].id + '">');
+				guilds[name].nodes[n].wrapInner("<a href=\"/index.php?box=armory&guild=" + guilds[name].id + "\">");
 			}
 		}
 	}
