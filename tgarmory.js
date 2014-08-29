@@ -602,5 +602,6 @@ function updateDB () {
 	else {
 		appendTooltips();
 	}
+	if(u.p.box && u.p.box == "shopITE") { return; }
 	buildGuildLinks();
 })();
