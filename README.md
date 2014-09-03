@@ -12,6 +12,8 @@ Pulls data from public proxy api - [Documentation gist](https://gist.github.com/
 * Fix items pictures positions on Chrome
 * Fix avatar picture with some races
 * Fix missing talent points
+* Links on guild names
+* Add guild pages
 * Add items & spells tooltips everywhere
 * Add last joined/left guild
 * Add average item level
@@ -25,6 +27,14 @@ Pulls data from public proxy api - [Documentation gist](https://gist.github.com/
 
 
 ### Changelog :
+**0.3.1**
+* jQuery update
+* Fixed guild links in shop
+
+**0.3.0**
+* Added guild pages
+* Added links to guild pages
+
 **0.2.4**
 * Armory display quickfix
 
