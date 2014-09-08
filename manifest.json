@@ -2,7 +2,7 @@
   "name": "TheGeekArmory",
   "short_name": "TGArmory",
   "author": "ZergRael",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "manifest_version": 2,
   "description": "Ameliorations sur l'armurerie de TheGeekCrusade-serveur.com",
   "icons": { 

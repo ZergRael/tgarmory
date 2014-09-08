@@ -27,6 +27,9 @@ Pulls data from public proxy api - [Documentation gist](https://gist.github.com/
 
 
 ### Changelog :
+**0.3.2**
+* insertScript shouldn't require jQuery
+
 **0.3.1**
 * jQuery update
 * Fixed guild links in shop
