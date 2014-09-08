@@ -68,7 +68,7 @@ function preInit () {
 // Insert script into DOM - Escape sandboxing
 function insertScript (id, f, removeAfterUse) {
 	document.body.appendChild(
-		$("<script>", { id: id, type: "text/javascript" }).text("(" + f.toString() + ")(jQuery)").get(0)
+		$("<script>", { id: id, type: "text/javascript" }).text("(" + f.toString() + ")()").get(0)
 	);
 	if(removeAfterUse) {
 		$("#" + id).remove();
