@@ -61,7 +61,7 @@ function appendTooltips () {
 }
 
 $(document).ready(function () {
-	var $tt = $("<div>", {id: "w_tooltip", style: "position: absolute;"}).hide(), offsetX, offsetY;
+	var $tt = $("<div>", {id: "w_tooltip", style: "position: absolute; z-index:200;"}).hide(), offsetX, offsetY;
 	$("body").prepend($tt);
 	$(document).mousemove(function(e) {
 		if(e.pageX) {
