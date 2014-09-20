@@ -1,25 +1,22 @@
 .tga_block {vertical-align: top;}
 .tga_frame {border-spacing: 0; border-collapse: collapse;}
 .tga_frame > tbody > tr > td, .tga_frame > tbody > tr > th {background: url(http://static.thetabx.net/images/wow/armory_stats.2.jpg);}
-.tga_frame > tbody > tr > th {padding: 20 0 0 24;}
-.tga_frame > tbody > tr > td {padding: 14 0 0 18;}
+.tga_frame > tbody > tr > th {padding: 20 0 0 24!important;}
+.tga_frame > tbody > tr > td {padding: 14 0 0 18!important;}
 .tga_header {padding-left: 10px; font-weight: bold;}
 #arena_teams {padding-bottom: 10px;}
-.arena_teams {display: inline-block; margin: 8px; min-width: 222px; vertical-align: top;}
+.tga_bracket {display: inline-block; vertical-align: top;}
+.arena_teams {margin: 8px; min-width: 222px;}
 .arena_teams .arena_bracket {color: #FFF; font-size: 36px; margin-left: 8px;}
 .arena_teams .arena_wins {color: #0C0;}
 .arena_teams .arena_loses {color: #C00;}
 .arena_teams .arena_percent {color: #C09A67;}
 .arena_teams .team_rating {padding: 8 8 8 8;}
 .arena_teams .arena_rating {color: #FC0; font-weight: bold; padding-left: 8px; padding-right: 8px;}
-.gear_updates {margin: 8px; min-width: 480px;}
+.gear_updates {margin: 8px;}
+.gear_updates .tga_frame_content {min-width:438px;}
 .honorally_currency {padding-right: 17px; background: no-repeat right center; background-image: url(http://static.thetabx.net/images/wow/icons/tiny/pvpcurrency-honor-alliance.gif);}
 .honorhorde_currency {padding-right: 17px; background: no-repeat right center; background-image: url(http://static.thetabx.net/images/wow/icons/tiny/pvpcurrency-honor-horde.gif);}
-.honorally {padding-left: 18px; background: no-repeat left center; background-image: url(http://static.thetabx.net/images/wow/icons/tiny/pvpcurrency-honor-alliance.gif);}
-.honorhorde {padding-right: 18px; background: no-repeat right center; background-image: url(http://static.thetabx.net/images/wow/icons/tiny/pvpcurrency-honor-horde.gif);}
-.tga_bg_table {float: right; text-align: right; padding-bottom: 12px; padding-right: 60px;}
-.tga_bg_table thead {text-align: center; font-weight: bold;}
-.tga_bg_td {padding-right: 18px; padding-left: 18px;}
 .clearfloat {clear: both;}
 .centered {text-align: center;}
 .guild_page h1 {text-align: center; margin-top: 6px; font-size: 32px;}
@@ -28,14 +25,14 @@
 .armory_guild_chars {width: 850px; margin-top: 22px;}
 .armory_guild_downs {width: 360px; float: left;}
 .armory_guild_loots {width: 480px; float: left; margin-right: 10px;}
-.armory_table {border-collapse: collapse; border: #404040 1px solid; background-color: #333333;}
+.armory_table {border-collapse: collapse; border: #404040 1px solid!important; background-color: #333333;}
 .armory_table thead td {text-align: center;}
-.armory_table tbody td {border: #404040 1px solid; background-color: #242424;}
-.armory_table td {padding: 6px;}
+.armory_table tbody td {border: #404040 1px solid!important; background-color: #242424;}
+.armory_table td {padding: 6px!important;}
 .armory_table .small_col {width: 50px; text-align: center;}
 .armory_table .hmed_col {width: 150px;}
 .armory_table .med_col {width: 300px;}
 .armory_table .large_col {width: 480px;}
-.armory_table .head_col {font-weight: bold; border: #404040 1px solid;}
+.armory_table .head_col {font-weight: bold; border: #404040 1px solid!important;}
 .armory_frame {width: 600px; min-height: 80px; margin-bottom: 12px; margin-left: auto; margin-right: auto;}
 td[style=' width:200px;height:50px;font-size:22px; color:#b4e718;padding-top:26px;  vertical-align:top; font-family:frizquadratatt;'] strong a {color: #b4e718;}

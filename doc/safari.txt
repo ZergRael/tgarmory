@@ -1,0 +1,26 @@
+Ok, here's a walkthrough.
+
+On two of these steps you'll be asked to create password. You can go with an empty one - just press Enter.
+
+Get OpenSSL. There are a few options here, I got mine here. I downloaded the first thing (light version) and Visual C++ Redistributables (you might already have them, OpenSSL installer will warn you if you need to get them). I installed OpenSSL in C:\OpenSSL and selected to copy OpenSSL DLLs to the OpenSSL binaries directory.
+Run this command in the standard Windows terminal:
+
+set OPENSSL_CONF=c:\OpenSSL\bin\openssl.cfg
+
+Then this one (as for details, I only entered my name and email, but probably even those are not required for Apple):
+
+c:\OpenSSL\bin\openssl.exe req -out CSR.csr -new -newkey rsa:2048 -nodes -keyout privateKey.key
+
+Upload the new file CSR.csr in the Certificates section on developer.apple.com. You'll get a file called safari_extension.cer in return.
+Run this:
+
+c:\OpenSSL\bin\openssl x509 -in safari_extension.cer -inform DER -out safari_extension_PEM.cer -outform PEM
+
+And this:
+
+c:\OpenSSL\bin\openssl pkcs12 -export -in safari_extension_PEM.cer -inkey privateKey.key -out bundle.p12
+
+Double click safari_extension.cer. Install it in the Personal certificate store.
+
+Double click bundle.p12. Install it in the same store.
+That's it. Open Safari and it should know about the certificate.

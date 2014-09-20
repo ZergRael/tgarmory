@@ -2,14 +2,23 @@
 "use strict";
 
 // Hacks to simulate chrome APIs
-if(typeof chrome == "undefined") {
+if(typeof safari != "undefined") {
+	var chrome = {
+		extension: {
+			getURL: function(str) {
+				return safari.extension.baseURI + str;
+			}
+		}
+	};
+}
+else if(typeof chrome == "undefined") {
 	var isFirefox = true,
 		chrome = {
-			extension: {
-				getURL: function(str) {
-					return self.options[str];
-				}
+		extension: {
+			getURL: function(str) {
+				return self.options[str];
 			}
+		}
 	};
 }
 
@@ -436,7 +445,7 @@ function appendArena (data) {
 		var team = data[brackets[i]];
 		if(!team) { continue; }
 		displayedTeams++;
-		htmlContent += buildFrame("arena_teams", "<div class='arena_bracket'><a href='http://thegeekcrusade-serveur.com/index.php?box=pvp&type=" + brackets[i] + "'>" + brackets[i] + "v" + brackets[i] + "</a></div>" + team.name + " <a class='arena_position' href='http://thegeekcrusade-serveur.com/index.php?box=armory&team=" + team.id + "'>#" + team.position + "</a><br /><table><tbody><tr><td>Equipe</td><td class='arena_rating team_rating'>" + team.rating + "</td><td><span class='arena_wins'>" + team.wins + "</span> - <span class='arena_loses'>" + team.loses + "</span></td></tr>" + teamToMembersHtml(team) + "</tbody></table>");
+		htmlContent += "<div class='tga_bracket'>" + buildFrame("arena_teams", "<div class='arena_bracket'><a href='http://thegeekcrusade-serveur.com/index.php?box=pvp&type=" + brackets[i] + "'>" + brackets[i] + "v" + brackets[i] + "</a></div>" + team.name + " <a class='arena_position' href='http://thegeekcrusade-serveur.com/index.php?box=armory&team=" + team.id + "'>#" + team.position + "</a><br /><table><tbody><tr><td>Equipe</td><td class='arena_rating team_rating'>" + team.rating + "</td><td><span class='arena_wins'>" + team.wins + "</span> - <span class='arena_loses'>" + team.loses + "</span></td></tr>" + teamToMembersHtml(team) + "</tbody></table>") + "</div>";
 	}
 	if(htmlContent.length > 0) {
 		$("table.cursor").parent().children("br").first().replaceWith("<div id='arena_teams' class='tga_block'>" + htmlContent + "</div>");
@@ -444,7 +453,6 @@ function appendArena (data) {
 	// If there's only one bracket to display, try to inline it with the gearUpdates frame
 	if(displayedTeams == 1) {
 		$(".tga_block").css("display", "inline-block");
-		$(".arena_teams").css("display", "block");
 	}
 }
 
