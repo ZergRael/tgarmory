@@ -1,25 +1,16 @@
 /*global $:false, i:true, self:false, createGuildPage:false*/
 "use strict";
 
-// Hacks to simulate chrome APIs
-if(typeof safari != "undefined") {
-	var chrome = {
-		extension: {
-			getURL: function(str) {
-				return safari.extension.baseURI + str;
-			}
-		}
-	};
+// Strandard storage API
+if(typeof safari != "undefined") { // Safari
+	function _extUrl (str) { return safari.extension.baseURI + str; }
 }
-else if(typeof chrome == "undefined") {
-	var isFirefox = true,
-		chrome = {
-		extension: {
-			getURL: function(str) {
-				return self.options[str];
-			}
-		}
-	};
+else if(typeof chrome == "undefined") { // Firefox
+	var isFirefox = true;
+	function _extUrl (str) { return self.options[str]; }
+}
+else { // Chrome
+	function _extUrl (str) { return chrome.extension.getURL(str); }
 }
 
 var cache = {},
@@ -68,7 +59,7 @@ function _load (key) {
 // On start functions, mostly css additions and corrections
 function preInit () {
 	if(isFirefox) { // Firefox does not automatically insert extension css
-		$("head").append("<link rel='stylesheet' type='text/css' href='" + chrome.extension.getURL("css/tgarmory.css") + "' />");
+		$("head").append("<link rel='stylesheet' type='text/css' href='" + _extUrl("css/tgarmory.css") + "' />");
 	}
 	$("head").append("<link rel='stylesheet' type='text/css' href='http://static.thetabx.net/css/wow/wowheadlike.css' />");
 	$("#curseur").css("width", "auto");
