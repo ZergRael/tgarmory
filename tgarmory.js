@@ -590,12 +590,15 @@ function updateDB () {
 			fixAvatar();
 			refactorItemTooltips();
 		}
-		else if(u.p.guild) {
-			if(u.p.guild.length === 0 || isNaN(u.p.guild)) { return; } // Guild armory check
-			if($("table").length > 10) { return; } // Probably real page
-
-			createGuildPage(u.p.guild);
+		else {
 			appendTooltips();
+
+			if(u.p.guild) {
+				if(u.p.guild.length === 0 || isNaN(u.p.guild)) { return; } // Guild armory check
+				if($("table").length > 10) { return; } // Probably real page
+
+				createGuildPage(u.p.guild);
+			}
 		}
 	}
 	else {
