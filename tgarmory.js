@@ -2,15 +2,16 @@
 "use strict";
 
 // Strandard storage API
+var _extUrl; // Trick for strict mode
 if(typeof safari != "undefined") { // Safari
-	function _extUrl (str) { return safari.extension.baseURI + str; }
+	_extUrl = function (str) { return safari.extension.baseURI + str; }
 }
 else if(typeof chrome == "undefined") { // Firefox
 	var isFirefox = true;
-	function _extUrl (str) { return self.options[str]; }
+	_extUrl = function (str) { return self.options[str]; }
 }
 else { // Chrome
-	function _extUrl (str) { return chrome.extension.getURL(str); }
+	_extUrl = function (str) { return chrome.extension.getURL(str); }
 }
 
 var cache = {},
