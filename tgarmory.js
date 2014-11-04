@@ -77,18 +77,12 @@ function insertScript (id, f, removeAfterUse) {
 	}
 }
 
-// Let's use native system to display tooltips, hackier than ever but doesn't break anything else
-// We can't use native montre() since tooltips comes with a children(visibility:none)
-function prepTooltip () {
-	insertScript("forceI", function() { i = true; }, true);
-}
-function showTooltip (text) {
-	insertScript("forceI", function() { i = true; }, true);
-	$("#curseur").html(text).css("visibility", "visible").children().show();
+// Custom tooltip management
+function showTooltip (data) {
+	$("#w_tooltip").html(data).show().trigger("mousemove");
 }
 function hideTooltip () {
-	insertScript("forceI", function() { i = false; }, true);
-	$("#curseur").css("visibility", "hidden").children().hide();
+	$("#w_tooltip").hide().html("");
 }
 // Extract tooltips, reformat them to nicer wowhead like tooltips
 function refactorItemTooltips () {
@@ -156,9 +150,6 @@ function refactorItemTooltips () {
 				item = {id: itemId, hash: hash, url: {item: itemId, tooltip: 1}};
 				cache[item.hash] = item;
 			}
-			// Allow #curseur to follow mouse even before data is ready
-			// Else, tooltip may be stuck on last hovered item
-			prepTooltip();
 			getData({data: item.url}, function (data) {
 				item.cache = data;
 				if(hovering == item.hash) {
@@ -478,7 +469,6 @@ function appendTooltips () {
 					obj.url.tooltip = 1;
 					cache[obj.hash] = obj;
 				}
-				prepTooltip();
 				getData({data: obj.url}, function (data) {
 					obj.cache = data;
 					if(hovering == obj.hash) {
@@ -558,6 +548,20 @@ function addGuildLinks (guilds) {
 	}
 }
 
+function prepTooltips () {
+	var $tt = $("<div>", {id: "w_tooltip", style: "position: absolute; z-index:2000;"}).hide(), offsetX, offsetY;
+	$("body").prepend($tt);
+	$(document).mousemove(function(e) {
+		if(e.pageX) {
+			offsetX = e.pageX + 11;
+			offsetY = e.pageY + 15;
+		}
+		if(hovering) {
+			$tt.offset({left: offsetX, top: offsetY});
+		}
+	});
+}
+
 function updateDB () {
 	var dbVer = _load("dbversion");
 	if (!dbVer) {
@@ -573,6 +577,7 @@ function updateDB () {
 
 	preInit();
 	updateDB();
+	prepTooltips();
 	if(u.p.box && u.p.box == "armory") {
 		if(u.p.character) {
 			if(u.p.character.length === 0 || isNaN(u.p.character)) { return; } // Char armory check
