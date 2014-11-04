@@ -17,7 +17,8 @@ else { // Chrome
 var cache = {},
 	staticUrl = "http://static.thetabx.net/",
 	apiUrl = "http://api.thetabx.net/tgc/3/",
-	DB_VERSION = 1;
+	DB_VERSION = 1,
+	hovering = false;
 
 // Format url into params hash
 function parseUrl (url) {
@@ -93,7 +94,6 @@ function hideTooltip () {
 function refactorItemTooltips () {
 	var enchantItemRegex = /<span style=\\"color:#0C0;\\">(?!Equipé|Utilisé|Chance)([^<]+)/,
 		slot = 0,
-		hovering = false,
 		showing = false,
 		isOriginalTooltip = false;
 	$("td[onmouseover], td[style^='width:32px;;']").each(function () {
@@ -449,8 +449,7 @@ function appendArena (data) {
 }
 
 function appendTooltips () {
-	var showing = false,
-		hovering = false;
+	var showing = false;
 	$(document).on("mouseenter mouseleave", "a[href*=spell\\=], a[href*=item\\=]", function(e) {
 		if(e.type == "mouseenter") {
 			var objMatch = $(this).attr("href").match(/(item|spell)=(\d+)/);
