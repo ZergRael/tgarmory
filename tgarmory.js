@@ -93,6 +93,13 @@ function prepTooltips () {
 			offsetX = e.pageX + 11;
 			offsetY = e.pageY + 15;
 		}
+		if(ttDisp.showing) {
+			var windowScrollTop = (document.body.scrollTop || document.documentElement.scrollTop),
+				ttHeight = $tt.height();
+			if(offsetY + ttHeight + 4 > windowScrollTop + window.innerHeight) {
+				offsetY = (windowScrollTop + window.innerHeight) - ttHeight - 4;
+			}
+		}
 		if(ttDisp.hovering) {
 			$tt.offset({left: offsetX, top: offsetY});
 		}
@@ -196,13 +203,13 @@ function appendTooltips () {
 				getData({data: obj.url}, function (data) {
 					obj.cache = data;
 					if(ttDisp.hovering == obj.hash) {
+						ttDisp.showing = obj.hash;
 						if(ttDisp.isOriginalTooltip && obj.originalTooltip) {
 							showTooltip(obj.originalTooltip);
 						}
 						else {
 							showTooltip(obj.cache);
 						}
-						ttDisp.showing = obj.hash;
 					}
 				});
 			}
