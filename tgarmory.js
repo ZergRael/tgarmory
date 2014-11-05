@@ -18,7 +18,7 @@ var cache = {},
 	staticUrl = "http://static.thetabx.net/",
 	apiUrl = "http://api.thetabx.net/tgc/3/",
 	DB_VERSION = 1,
-	hovering = false;
+	ttDisp = {showing: false, hovering: false, isOriginalTooltip: false};
 
 // Format url into params hash
 function parseUrl (url) {
@@ -84,12 +84,24 @@ function showTooltip (data) {
 function hideTooltip () {
 	$("#w_tooltip").hide().html("");
 }
+// Build tooltip frame
+function prepTooltips () {
+	var $tt = $("<div>", {id: "w_tooltip", style: "position: absolute; z-index:2000;"}).hide(), offsetX, offsetY;
+	$("body").prepend($tt);
+	$(document).mousemove(function(e) {
+		if(e.pageX) {
+			offsetX = e.pageX + 11;
+			offsetY = e.pageY + 15;
+		}
+		if(ttDisp.hovering) {
+			$tt.offset({left: offsetX, top: offsetY});
+		}
+	});
+}
 // Extract tooltips, reformat them to nicer wowhead like tooltips
 function refactorItemTooltips () {
 	var enchantItemRegex = /<span style=\\"color:#0C0;\\">(?!Equipé|Utilisé|Chance)([^<]+)/,
-		slot = 0,
-		showing = false,
-		isOriginalTooltip = false;
+		slot = 0
 	$("td[onmouseover], td[style^='width:32px;;']").each(function () {
 		var $this = $(this);
 		// Fix the horizontal and vertical padding on bottom tr
@@ -127,61 +139,78 @@ function refactorItemTooltips () {
 		// Rewrite tr html to force inline onmouseover erase, removeAttr is not enough
 		$(this).html($(this).html());
 	});
-	// Display better tooltips on every item link. $(document).on() because some item links may come later
-	$(document).on("mouseenter", "a[href^='index.php?box=armory&item']", function() {
-		var itemId = Number($(this).attr("href").match(/\d+/)[0]),
-			slot = $(this).attr("data_slot"),
-			hash = "i" + itemId + (slot ? "_" + slot : ""),
-			item = cache[hash];
-		hovering = hash;
-		if(item && item.cache) {
-			// Show cached item tooltip if available
-			showing = item.hash;
-			if(isOriginalTooltip && item.originalTooltip) {
-				showTooltip(item.originalTooltip);
-			}
-			else {
-				showTooltip(item.cache);
-			}
-		}
-		else {
-			if(!item) {
-				// It's an item we haven't parsed, just build it
-				item = {id: itemId, hash: hash, url: {item: itemId, tooltip: 1}};
-				cache[item.hash] = item;
-			}
-			getData({data: item.url}, function (data) {
-				item.cache = data;
-				if(hovering == item.hash) {
-					if(isOriginalTooltip && item.originalTooltip) {
-						showTooltip(item.originalTooltip);
-					}
-					else {
-						showTooltip(data);
-					}
-					showing = item.hash;
-				}
-			});
-		}
-	}).on("mouseleave", "a[href^='index.php?box=armory&item']", function() {
-		showing = false;
-		hovering = false;
-		hideTooltip();
-	}).on("keydown keyup", function(e) {
+	$(document).on("keydown keyup", function(e) {
 		// CTRL key
 		if(e.which != 17) { return; }
 		// Toggle between new and original tooltip
 		if(e.type == "keydown") {
-			if(showing && !isOriginalTooltip && cache[showing].originalTooltip) {
-				isOriginalTooltip = true;
-				showTooltip(cache[showing].originalTooltip);
+			if(ttDisp.showing && !ttDisp.isOriginalTooltip && cache[ttDisp.showing].originalTooltip) {
+				ttDisp.isOriginalTooltip = true;
+				showTooltip(cache[ttDisp.showing].originalTooltip);
 			}
 		}
 		else if(e.type == "keyup") {
-			isOriginalTooltip = false;
-			if(showing) {
-				showTooltip(cache[showing].cache);
+			ttDisp.isOriginalTooltip = false;
+			if(ttDisp.showing) {
+				showTooltip(cache[ttDisp.showing].cache);
 			}
+		}
+	});
+}
+// Generic tooltip display
+function appendTooltips () {
+	$(document).on("mouseenter mouseleave", "a[href*=spell\\=], a[href*=item\\=]", function(e) {
+		if(e.type == "mouseenter") {
+			var objMatch = $(this).attr("href").match(/(item|spell)=(\d+)/);
+			if(!objMatch || !objMatch[1] || !objMatch[2]) { return; }
+			var objId = objMatch[2],
+				slot = $(this).attr("data_slot"),
+				prefix = false;
+			switch(objMatch[1]) {
+				case "item": prefix = "i";
+					break;
+				case "spell": prefix = "s";
+					break;
+			}
+			if(!prefix) { return; }
+
+			var hash = prefix + objId + (slot ? "_" + slot : ""),
+				obj = cache[hash];
+			ttDisp.hovering = hash;
+			if(obj && obj.cache) {
+				ttDisp.showing = obj.hash;
+				if(ttDisp.isOriginalTooltip && obj.originalTooltip) {
+					showTooltip(obj.originalTooltip);
+				}
+				else {
+					showTooltip(obj.cache);
+				}
+			}
+			else {
+				if(!obj) {
+					obj = {id: objId, hash: hash, url: {}};
+					obj.url[objMatch[1]] = objId;
+					obj.url.tooltip = 1;
+					cache[obj.hash] = obj;
+				}
+				getData({data: obj.url}, function (data) {
+					obj.cache = data;
+					if(ttDisp.hovering == obj.hash) {
+						if(ttDisp.isOriginalTooltip && obj.originalTooltip) {
+							showTooltip(obj.originalTooltip);
+						}
+						else {
+							showTooltip(obj.cache);
+						}
+						ttDisp.showing = obj.hash;
+					}
+				});
+			}
+		}
+		else {
+			ttDisp.showing = false;
+			ttDisp.hovering = false;
+			hideTooltip();
 		}
 	});
 }
@@ -439,53 +468,6 @@ function appendArena (data) {
 	}
 }
 
-function appendTooltips () {
-	var showing = false;
-	$(document).on("mouseenter mouseleave", "a[href*=spell\\=], a[href*=item\\=]", function(e) {
-		if(e.type == "mouseenter") {
-			var objMatch = $(this).attr("href").match(/(item|spell)=(\d+)/);
-			if(!objMatch || !objMatch[1] || !objMatch[2]) { return; }
-			var objId = objMatch[2],
-				prefix = false;
-			switch(objMatch[1]) {
-				case "item": prefix = "i";
-					break;
-				case "spell": prefix = "s";
-					break;
-			}
-			if(!prefix) { return; }
-
-			var hash = prefix + objId,
-				obj = cache[hash];
-			hovering = hash;
-			if(obj && obj.cache) {
-				showing = obj.hash;
-				showTooltip(obj.cache);
-			}
-			else {
-				if(!obj) {
-					obj = {id: objId, hash: hash, url: {}};
-					obj.url[objMatch[1]] = objId;
-					obj.url.tooltip = 1;
-					cache[obj.hash] = obj;
-				}
-				getData({data: obj.url}, function (data) {
-					obj.cache = data;
-					if(hovering == obj.hash) {
-						showTooltip(obj.cache);
-						showing = obj.hash;
-					}
-				});
-			}
-		}
-		else {
-			showing = false;
-			hovering = false;
-			hideTooltip();
-		}
-	});
-}
-
 function buildGuildLinks () {
 	var $guilds = $("span[style='color:#fff; font-size:11px;'], td[style='padding-top:8px;padding-bottom:6px; font-size:9px; padding-left:4px;text-align:center'], p[style='font:0.9em Arial, sans-serif ; line-height:1em;color:;margin:0px; padding:0px;'], td[style=' width:200px;height:50px;font-size:22px; color:#b4e718;padding-top:26px;  vertical-align:top; font-family:frizquadratatt;'] strong, td[style='width:300px;'][align='center'].armory_search_header_td"),
 		guilds = {};
@@ -548,20 +530,6 @@ function addGuildLinks (guilds) {
 	}
 }
 
-function prepTooltips () {
-	var $tt = $("<div>", {id: "w_tooltip", style: "position: absolute; z-index:2000;"}).hide(), offsetX, offsetY;
-	$("body").prepend($tt);
-	$(document).mousemove(function(e) {
-		if(e.pageX) {
-			offsetX = e.pageX + 11;
-			offsetY = e.pageY + 15;
-		}
-		if(hovering) {
-			$tt.offset({left: offsetX, top: offsetY});
-		}
-	});
-}
-
 function updateDB () {
 	var dbVer = _load("dbversion");
 	if (!dbVer) {
@@ -595,20 +563,14 @@ function updateDB () {
 			fixAvatar();
 			refactorItemTooltips();
 		}
-		else {
-			appendTooltips();
+		else if(u.p.guild) {
+			if(u.p.guild.length === 0 || isNaN(u.p.guild)) { return; } // Guild armory check
+			if($("table").length > 10) { return; } // Probably real page
 
-			if(u.p.guild) {
-				if(u.p.guild.length === 0 || isNaN(u.p.guild)) { return; } // Guild armory check
-				if($("table").length > 10) { return; } // Probably real page
-
-				createGuildPage(u.p.guild);
-			}
+			createGuildPage(u.p.guild);
 		}
 	}
-	else {
-		appendTooltips();
-	}
+	appendTooltips();
 	if(u.p.box && u.p.box == "shopITE") { return; }
 	buildGuildLinks();
 })();
