@@ -3,13 +3,15 @@ var cache = {},
 	STATIC_URL = "http://static.thetabx.net/",
 	API_URL = "http://api.thetabx.net/tgc/3/",
 	CSS_URL = "http://static.thetabx.net/css/wow/wowheadlike.css",
-	hovering = false;
+	ttDisp = {hovering : false, showing: false, tt: false};
 
 function showTooltip (data) {
-	$("#w_tooltip").html(data).show().trigger("mousemove");
+	ttDisp.tt.html(data).show().trigger("mousemove");
 }
 function hideTooltip () {
-	$("#w_tooltip").hide().html("");
+	ttDisp.hovering = false;
+	ttDisp.showing = false;
+	ttDisp.tt.hide().html("");
 }
 function appendTooltips () {
 	$(document).on("mouseenter mouseleave", "a[href*=spell\\=], a[href*=item\\=]", function(e) {
@@ -28,8 +30,9 @@ function appendTooltips () {
 
 			var hash = prefix + objId,
 				obj = cache[hash];
-			hovering = hash;
+			ttDisp.hovering = hash;
 			if(obj && obj.cache) {
+				ttDisp.showing = obj.hash;
 				showTooltip(obj.cache);
 			}
 			else {
@@ -47,6 +50,7 @@ function appendTooltips () {
 					success: function (data) {
 						obj.cache = data;
 						if(hovering == obj.hash) {
+							ttDisp.showing = obj.hash;
 							showTooltip(obj.cache);
 						}
 					}
@@ -54,22 +58,29 @@ function appendTooltips () {
 			}
 		}
 		else {
-			hovering = false;
 			hideTooltip();
 		}
 	});
 }
 
 $(document).ready(function () {
-	var $tt = $("<div>", {id: "w_tooltip", style: "position: absolute; z-index:200;"}).hide(), offsetX, offsetY;
+	ttDisp.tt = $("<div>", {id: "w_tooltip", style: "position: absolute; z-index:2000;"}).hide();
+	var offsetX, offsetY;
 	$("body").prepend($tt);
 	$(document).mousemove(function(e) {
 		if(e.pageX) {
 			offsetX = e.pageX + 11;
 			offsetY = e.pageY + 15;
 		}
+		if(ttDisp.showing) {
+			var windowScrollTop = (document.body.scrollTop || document.documentElement.scrollTop),
+				ttHeight = $tt.height();
+			if(offsetY + ttHeight + 4 > windowScrollTop + window.innerHeight) {
+				offsetY = (windowScrollTop + window.innerHeight) - ttHeight - 4;
+			}
+		}
 		if(hovering) {
-			$tt.offset({left: offsetX, top: offsetY});
+			ttDisp.tt.offset({left: offsetX, top: offsetY});
 		}
 	});
 	appendTooltips();

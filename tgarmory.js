@@ -18,7 +18,7 @@ var cache = {},
 	staticUrl = "http://static.thetabx.net/",
 	apiUrl = "http://api.thetabx.net/tgc/3/",
 	DB_VERSION = 1,
-	ttDisp = {showing: false, hovering: false, isOriginalTooltip: false};
+	ttDisp = {showing: false, hovering: false, isOriginalTooltip: false, tt: false, x: 0, y: 0};
 
 // Format url into params hash
 function parseUrl (url) {
@@ -79,15 +79,15 @@ function insertScript (id, f, removeAfterUse) {
 
 // Custom tooltip management
 function showTooltip (data) {
-	$("#w_tooltip").html(data).show().trigger("mousemove");
+	ttDisp.tt.html(data).show().trigger("mousemove");
 }
 function hideTooltip () {
-	$("#w_tooltip").hide().html("");
+	ttDisp.showing = false;
+	ttDisp.hovering = false;
+	ttDisp.tt.hide().html("");
 }
 // Build tooltip frame
 function prepTooltips () {
-	var $tt = $("<div>", {id: "w_tooltip", style: "position: absolute; z-index:2000;"}).hide(), offsetX, offsetY;
-	$("body").prepend($tt);
 	$(document).mousemove(function(e) {
 		if(e.pageX) {
 			offsetX = e.pageX + 11;
@@ -95,15 +95,17 @@ function prepTooltips () {
 		}
 		if(ttDisp.showing) {
 			var windowScrollTop = (document.body.scrollTop || document.documentElement.scrollTop),
-				ttHeight = $tt.height();
+				ttHeight = ttDisp.tt.height();
 			if(offsetY + ttHeight + 4 > windowScrollTop + window.innerHeight) {
 				offsetY = (windowScrollTop + window.innerHeight) - ttHeight - 4;
 			}
 		}
 		if(ttDisp.hovering) {
-			$tt.offset({left: offsetX, top: offsetY});
+			ttDisp.tt.offset({left: offsetX, top: offsetY});
 		}
 	});
+	ttDisp.tt = $("<div>", {id: "w_tooltip", style: "position: absolute; z-index:2000;"}).hide();
+	$("body").prepend(ttDisp.tt);
 }
 // Extract tooltips, reformat them to nicer wowhead like tooltips
 function refactorItemTooltips () {
@@ -215,8 +217,6 @@ function appendTooltips () {
 			}
 		}
 		else {
-			ttDisp.showing = false;
-			ttDisp.hovering = false;
 			hideTooltip();
 		}
 	});
