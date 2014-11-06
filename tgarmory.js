@@ -90,18 +90,18 @@ function hideTooltip () {
 function prepTooltips () {
 	$(document).mousemove(function(e) {
 		if(e.pageX) {
-			offsetX = e.pageX + 11;
-			offsetY = e.pageY + 15;
+			ttDisp.x = e.pageX + 11;
+			ttDisp.y = e.pageY + 15;
 		}
 		if(ttDisp.showing) {
 			var windowScrollTop = (document.body.scrollTop || document.documentElement.scrollTop),
 				ttHeight = ttDisp.tt.height();
-			if(offsetY + ttHeight + 4 > windowScrollTop + window.innerHeight) {
-				offsetY = (windowScrollTop + window.innerHeight) - ttHeight - 4;
+			if(ttDisp.y + ttHeight + 4 > windowScrollTop + window.innerHeight) {
+				ttDisp.y = (windowScrollTop + window.innerHeight) - ttHeight - 4;
 			}
 		}
 		if(ttDisp.hovering) {
-			ttDisp.tt.offset({left: offsetX, top: offsetY});
+			ttDisp.tt.offset({left: ttDisp.x, top: ttDisp.y});
 		}
 	});
 	ttDisp.tt = $("<div>", {id: "w_tooltip", style: "position: absolute; z-index:2000;"}).hide();

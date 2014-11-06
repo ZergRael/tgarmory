@@ -3,7 +3,7 @@ var cache = {},
 	STATIC_URL = "http://static.thetabx.net/",
 	API_URL = "http://api.thetabx.net/tgc/3/",
 	CSS_URL = "http://static.thetabx.net/css/wow/wowheadlike.css",
-	ttDisp = {hovering : false, showing: false, tt: false};
+	ttDisp = {hovering : false, showing: false, tt: false, x: 0, y: 0};
 
 function showTooltip (data) {
 	ttDisp.tt.html(data).show().trigger("mousemove");
@@ -65,22 +65,21 @@ function appendTooltips () {
 
 $(document).ready(function () {
 	ttDisp.tt = $("<div>", {id: "w_tooltip", style: "position: absolute; z-index:2000;"}).hide();
-	var offsetX, offsetY;
 	$("body").prepend($tt);
 	$(document).mousemove(function(e) {
 		if(e.pageX) {
-			offsetX = e.pageX + 11;
-			offsetY = e.pageY + 15;
+			ttDisp.x = e.pageX + 11;
+			ttDisp.y = e.pageY + 15;
 		}
 		if(ttDisp.showing) {
 			var windowScrollTop = (document.body.scrollTop || document.documentElement.scrollTop),
 				ttHeight = $tt.height();
-			if(offsetY + ttHeight + 4 > windowScrollTop + window.innerHeight) {
-				offsetY = (windowScrollTop + window.innerHeight) - ttHeight - 4;
+			if(ttDisp.y + ttHeight + 4 > windowScrollTop + window.innerHeight) {
+				ttDisp.y = (windowScrollTop + window.innerHeight) - ttHeight - 4;
 			}
 		}
 		if(hovering) {
-			ttDisp.tt.offset({left: offsetX, top: offsetY});
+			ttDisp.tt.offset({left: ttDisp.x, top: ttDisp.y});
 		}
 	});
 	appendTooltips();
