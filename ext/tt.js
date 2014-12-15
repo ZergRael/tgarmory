@@ -3,10 +3,11 @@ var cache = {},
 	STATIC_URL = "http://static.thetabx.net/",
 	API_URL = "http://api.thetabx.net/tgc/3/",
 	CSS_URL = "http://static.thetabx.net/css/wow/wowheadlike.css",
-	ttDisp = {hovering : false, showing: false, tt: false, x: 0, y: 0};
+	ttDisp = {showing: false, hovering : false, tt: false, x: 0, y: 0};
 
 function showTooltip (data) {
-	ttDisp.tt.html(data).show().trigger("mousemove");
+	ttDisp.tt.html(data).show(10, tooltipMove);
+	tooltipMove();
 }
 function hideTooltip () {
 	ttDisp.hovering = false;
@@ -49,7 +50,7 @@ function appendTooltips () {
 					cache: true,
 					success: function (data) {
 						obj.cache = data;
-						if(hovering == obj.hash) {
+						if(ttDisp.hovering == obj.hash) {
 							ttDisp.showing = obj.hash;
 							showTooltip(obj.cache);
 						}
@@ -62,26 +63,27 @@ function appendTooltips () {
 		}
 	});
 }
+function tooltipMove(e) {
+	if(e && e.pageX) {
+		ttDisp.x = e.pageX + 11;
+		ttDisp.y = e.pageY + 15;
+	}
+	if(ttDisp.showing) {
+		var windowScrollTop = (document.body.scrollTop || document.documentElement.scrollTop),
+			ttHeight = ttDisp.tt.height();
+		if(ttDisp.y + ttHeight + 4 > windowScrollTop + window.innerHeight) {
+			ttDisp.y = (windowScrollTop + window.innerHeight) - ttHeight - 4;
+		}
+	}
+	if(ttDisp.hovering) {
+		ttDisp.tt.offset({left: ttDisp.x, top: ttDisp.y});
+	}
+}
 
 $(document).ready(function () {
 	ttDisp.tt = $("<div>", {id: "w_tooltip", style: "position: absolute; z-index:2000;"}).hide();
-	$("body").prepend($tt);
-	$(document).mousemove(function(e) {
-		if(e.pageX) {
-			ttDisp.x = e.pageX + 11;
-			ttDisp.y = e.pageY + 15;
-		}
-		if(ttDisp.showing) {
-			var windowScrollTop = (document.body.scrollTop || document.documentElement.scrollTop),
-				ttHeight = $tt.height();
-			if(ttDisp.y + ttHeight + 4 > windowScrollTop + window.innerHeight) {
-				ttDisp.y = (windowScrollTop + window.innerHeight) - ttHeight - 4;
-			}
-		}
-		if(hovering) {
-			ttDisp.tt.offset({left: ttDisp.x, top: ttDisp.y});
-		}
-	});
+	$("body").prepend(ttDisp.tt);
+	$(document).mousemove(tooltipMove);
 	appendTooltips();
 	if($("head link[href='" + CSS_URL + "']").length) { return; }
 	$("head").append($("<link>", {rel: "stylesheet", type: "text/css", href: CSS_URL}));
