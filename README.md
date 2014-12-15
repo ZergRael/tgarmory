@@ -27,6 +27,9 @@ Pulls data from public proxy api - [Documentation gist](https://gist.github.com/
 
 
 ### Changelog :
+****
+* Better tooltip placement on screen edges
+
 **0.3.2**
 * insertScript shouldn't require jQuery
 

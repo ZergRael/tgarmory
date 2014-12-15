@@ -15,21 +15,13 @@ function hideTooltip () {
 	ttDisp.tt.hide().html("");
 }
 function appendTooltips () {
-	$(document).on("mouseenter mouseleave", "a[href*=spell\\=], a[href*=item\\=]", function(e) {
+	$(document).on("mouseenter mouseleave", "a[href*=spell\\=], a[href*=item\\=]"/*, a[href*=npc\\=], a[href*=char\\=]"*/, function(e) {
 		if(e.type == "mouseenter") {
-			var objMatch = $(this).attr("href").match(/(item|spell)=(\d+)/);
-			if(!objMatch || !objMatch[1] || !objMatch[2]) { return; }
-			var objId = objMatch[2],
-				prefix = false;
-			switch(objMatch[1]) {
-				case "item": prefix = "i";
-					break;
-				case "spell": prefix = "s";
-					break;
-			}
-			if(!prefix) { return; }
-
-			var hash = prefix + objId,
+			var objMatch = $(this).attr("href").match(/(item|spell|npc|char)=(\d+)/);
+			if(!objMatch) { return; }
+			var prefix = objMatch[1].substr(0, 1),
+				objId = objMatch[2],
+				hash = prefix + objId,
 				obj = cache[hash];
 			ttDisp.hovering = hash;
 			if(obj && obj.cache) {
