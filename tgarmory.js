@@ -79,7 +79,8 @@ function insertScript (id, f, removeAfterUse) {
 
 // Custom tooltip management
 function showTooltip (data) {
-	ttDisp.tt.html(data).show().trigger("mousemove");
+	ttDisp.tt.html(data).show(10, tooltipMove);
+	tooltipMove();
 }
 function hideTooltip () {
 	ttDisp.showing = false;
@@ -88,25 +89,28 @@ function hideTooltip () {
 }
 // Build tooltip frame
 function prepTooltips () {
-	$(document).mousemove(function(e) {
-		if(e.pageX) {
-			ttDisp.x = e.pageX + 11;
-			ttDisp.y = e.pageY + 15;
-		}
-		if(ttDisp.showing) {
-			var windowScrollTop = (document.body.scrollTop || document.documentElement.scrollTop),
-				ttHeight = ttDisp.tt.height();
-			if(ttDisp.y + ttHeight + 4 > windowScrollTop + window.innerHeight) {
-				ttDisp.y = (windowScrollTop + window.innerHeight) - ttHeight - 4;
-			}
-		}
-		if(ttDisp.hovering) {
-			ttDisp.tt.offset({left: ttDisp.x, top: ttDisp.y});
-		}
-	});
 	ttDisp.tt = $("<div>", {id: "w_tooltip", style: "position: absolute; z-index:2000;"}).hide();
 	$("body").prepend(ttDisp.tt);
+	$(document).mousemove(tooltipMove);
 }
+// Move tooltip on mousemove
+function tooltipMove(e) {
+	if(e && e.pageX) {
+		ttDisp.x = e.pageX + 11;
+		ttDisp.y = e.pageY + 15;
+	}
+	if(ttDisp.showing) {
+		var windowScrollTop = (document.body.scrollTop || document.documentElement.scrollTop),
+			ttHeight = ttDisp.tt.height();
+		if(ttDisp.y + ttHeight + 4 > windowScrollTop + window.innerHeight) {
+			ttDisp.y = (windowScrollTop + window.innerHeight) - ttHeight - 4;
+		}
+	}
+	if(ttDisp.hovering) {
+		ttDisp.tt.offset({left: ttDisp.x, top: ttDisp.y});
+	}
+}
+
 // Extract tooltips, reformat them to nicer wowhead like tooltips
 function refactorItemTooltips () {
 	var enchantItemRegex = /<span style=\\"color:#0C0;\\">(?!Equipé|Utilisé|Chance)([^<]+)/,
