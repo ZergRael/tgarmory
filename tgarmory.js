@@ -18,7 +18,8 @@ var cache = {},
 	staticUrl = "http://static.thetabx.net/",
 	apiUrl = "http://api.thetabx.net/tgc/3/",
 	DB_VERSION = 1,
-	ttDisp = {showing: false, hovering: false, isOriginalTooltip: false, tt: false, x: 0, y: 0};
+	ttDisp = {showing: false, hovering: false, isOriginalTooltip: false, tt: false, x: 0, y: 0},
+	invalidGuilds = ["Assistant communautaire", "Pas-de-Personnage"];
 
 // Format url into params hash
 function parseUrl (url) {
@@ -481,12 +482,12 @@ function buildGuildLinks () {
 		var bName = $(this).text().trim();
 		if(bName === "") { return; }
 		var name = bName.indexOf("<") == -1 ? bName : bName.substring(1, bName.length - 1);
-		if(name == "Pas-de-Personnage") { return; }
+		if(invalidGuilds.indexOf(name) != -1) { return; }
 		if(guilds[name]) {
 			guilds[name].nodes.push($(this));
 		}
 		else {
-			guilds[name] = {bName: bName , nodes: [$(this)]};
+			guilds[name] = {bName: bName, nodes: [$(this)]};
 		}
 	});
 
