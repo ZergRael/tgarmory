@@ -545,7 +545,7 @@ function updateDB () {
 	if(window.location.host != "thegeekcrusade-serveur.com") { return; }
 
 	var u = parseUrl(window.location.href);
-	if(!u) { return; }
+	if(!u || u.path == "/db/") { return; }
 
 	preInit();
 	updateDB();
