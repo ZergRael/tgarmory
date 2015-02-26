@@ -19,7 +19,7 @@ var cache = {},
 	apiUrl = "http://api.thetabx.net/tgc/3/",
 	DB_VERSION = 1,
 	ttDisp = {showing: false, hovering: false, isOriginalTooltip: false, tt: false, x: 0, y: 0},
-	invalidGuilds = ["Assistant communautaire", "Pas-de-Personnage"];
+	invalidGuilds = ["Assistant communautaire", "Community Manager", "MVP", "Maître de jeu", "Administrateur", "Pas-de-Personnage"];
 
 // Format url into params hash
 function parseUrl (url) {
