@@ -1,6 +1,3 @@
-/*global $:false, buildFrame:false, getData:false, dateToString:false, staticUrl:false*/
-"use strict";
-
 function buildGuildPage () {
 	var html = $("<div>", {class: "guild_page"}).append(
 		$("<h1>", {text: "Guilde"}),
@@ -123,3 +120,4 @@ function createGuildPage (guildId) {
 		}
 	});
 }
+

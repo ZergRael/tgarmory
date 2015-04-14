@@ -1,6 +1,7 @@
 test_data/
 build/
 *.pyc
+tgarmory.js
 
 .zip
 .DS_Store

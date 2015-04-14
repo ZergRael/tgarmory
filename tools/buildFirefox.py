@@ -5,22 +5,18 @@ import distutils.dir_util
 import distutils.file_util
 import json
 
-sdkDir = "addon-sdk-1.16"
+sdkDir = "addon-sdk-1.17"
 firefoxDir = "ff_tgarmory"
 chromeDir = "tgarmory"
 
 def run():
 	print("Update data")
-	os.chdir("..")
 	print(os.getcwd())
 
 	copyDirs = ["lib", "css", "images"]
 	for cDir in copyDirs :
 		distutils.dir_util.copy_tree(cDir, os.path.join("..", firefoxDir, "data", cDir))
-	copyFiles = ["*.js"]
-	for cFile in copyFiles :
-		for fileName in glob.iglob(cFile) :
-			distutils.file_util.copy_file(fileName, os.path.join("..", firefoxDir, "data"))
+	distutils.file_util.copy_file("tgarmory.js", os.path.join("..", firefoxDir, "data"))
 
 	print("Update version")
 	with open(os.path.join("manifest.json"), 'r') as content_file:
@@ -91,5 +87,5 @@ def run():
 		print("Copy .xpi")
 		distutils.file_util.copy_file("tgarmory.xpi", os.path.join("..", chromeDir, "build"))
 
-	os.chdir(os.path.join("..", chromeDir, "tools"))
+	os.chdir(os.path.join("..", chromeDir))
 	print("Done")
