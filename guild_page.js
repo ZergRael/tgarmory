@@ -81,7 +81,7 @@ function fillGuildPage (guild) {
 			$("<td>", {class: "small_col", text: member.level}),
 			$("<td>", {class: "small_col"}).append($("<img>", {src: "img/race-" + member.race + ".gif"})),
 			$("<td>", {class: "small_col"}).append($("<img>", {src: "img/class-" + member.class + ".gif"})),
-			$("<td>", {class: "small_col"}).append(member.spec !== null ? $("<img>", {src: staticUrl + "images/wow/armory/spec/small/" + member.class + "-" + member.spec + ".jpg"}) : ""),
+			$("<td>", {class: "small_col"}).append(member.spec !== null ? $("<img>", {src: STATIC_URL + "images/wow/armory/spec/small/" + member.class + "-" + member.spec + ".jpg"}) : ""),
 			$("<td>", {class: "hmed_col centered", text: member.lastAct > 0 ? dateToString(new Date(member.lastAct * 1000), true) : ""})
 		));
 	}
@@ -89,10 +89,10 @@ function fillGuildPage (guild) {
 	$(".armory_guild_chars tbody").append(membersHtml);
 
 	// Loots
-	for(var i in guild.gearUpdates) {
-		var loot = guild.gearUpdates[i];
+	for(var j in guild.gearUpdates) {
+		var loot = guild.gearUpdates[j];
 		lootsHtml.push($("<tr>").append(
-			$("<td>", {class: "large_col"}).append($("<a>", {href: "/index.php?box=armory&item=" + loot.itemId}).append($("<img>", {src: staticUrl + "images/wow/icons/small/" + loot.icon.toLowerCase() + ".jpg", width: 18, height: 18}), " " + loot.name)),
+			$("<td>", {class: "large_col"}).append($("<a>", {href: "/index.php?box=armory&item=" + loot.itemId}).append($("<img>", {src: STATIC_URL + "images/wow/icons/small/" + loot.icon.toLowerCase() + ".jpg", width: 18, height: 18}), " " + loot.name)),
 			$("<td>", {class: "small_col"}).append($("<a>", {href: "/index.php?box=armory&character=" + loot.char, text: members[loot.char]})),
 			$("<td>", {class: "small_col", text: dateToString(new Date(loot.timestamp * 1000))})
 		));
@@ -101,8 +101,8 @@ function fillGuildPage (guild) {
 	$(".armory_guild_loots tbody").append(lootsHtml);
 
 	// Bosses
-	for(var i in guild.recentDowns) {
-		var boss = guild.recentDowns[i];
+	for(var k in guild.recentDowns) {
+		var boss = guild.recentDowns[k];
 		bossHtml.push($("<tr>").append(
 			$("<td>", {class: "med_col", text: boss.name}),
 			$("<td>", {class: "med_col centered", text: dateToString(new Date(boss.timestamp * 1000), true)})

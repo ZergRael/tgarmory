@@ -1,6 +1,7 @@
+/*global $:false*/
+"use strict";
 //$.ajax({dataType:'script',cache:true,url:'http://static.thetabx.net/js/wow/tt.js'});
 var cache = {},
-	STATIC_URL = "http://static.thetabx.net/",
 	API_URL = "http://api.thetabx.net/tgc/3/",
 	CSS_URL = "http://static.thetabx.net/css/wow/wowheadlike.css",
 	ttDisp = {showing: false, hovering : false, tt: false, x: 0, y: 0};

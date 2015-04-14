@@ -20,7 +20,7 @@ function parseUrl (url) {
 // Probably not necessary to encapsulate, looks nicer
 function getData (o, cb) {
 	$.ajax({
-		url: apiUrl + (o.url || ""),
+		url: API_URL + (o.url || ""),
 		type: "GET",
 		data: o.data || {},
 		cache: true,
@@ -43,16 +43,6 @@ function preInit () {
 	}
 	$("head").append("<link rel='stylesheet' type='text/css' href='http://static.thetabx.net/css/wow/wowheadlike.css' />");
 	$("#curseur").css("width", "auto");
-}
-
-// Insert script into DOM - Escape sandboxing
-function insertScript (id, f, removeAfterUse) {
-	document.body.appendChild(
-		$("<script>", { id: id, type: "text/javascript" }).text("(" + f.toString() + ")()").get(0)
-	);
-	if(removeAfterUse) {
-		$("#" + id).remove();
-	}
 }
 
 // Custom tooltip management
@@ -92,7 +82,7 @@ function tooltipMove(e) {
 // Extract tooltips, reformat them to nicer wowhead like tooltips
 function refactorItemTooltips () {
 	var enchantItemRegex = /<span style=\\"color:#0C0;\\">(?!Equipé|Utilisé|Chance)([^<]+)/,
-		slot = 0
+		slot = 0;
 	$("td[onmouseover], td[style^='width:32px;;']").each(function () {
 		var $this = $(this);
 		// Fix the horizontal and vertical padding on bottom tr
@@ -281,14 +271,14 @@ function fixTalents () { // (talents) {
 
 	// If talents seems ok, let's correct colors
 	if(talents.total == level - 9) {
-		for(var treeN = 0; treeN < talents.trees.length; treeN++) {
-			for(var rowN = 0; rowN < talents.trees[treeN].length; rowN++) {
-				for(var colN = 0; colN < talents.trees[treeN][rowN].length; colN++) {
-					if(talents.trees[treeN][rowN][colN].p === 0) {
-						talents.trees[treeN][rowN][colN].node.css("color", "#999");
+		for(var treeM = 0; treeM < talents.trees.length; treeM++) {
+			for(var rowN = 0; rowN < talents.trees[treeM].length; rowN++) {
+				for(var colN = 0; colN < talents.trees[treeM][rowN].length; colN++) {
+					if(talents.trees[treeM][rowN][colN].p === 0) {
+						talents.trees[treeM][rowN][colN].node.css("color", "#999");
 					}
 					else {
-						talents.trees[treeN][rowN][colN].node.css("color", "#FC0");
+						talents.trees[treeM][rowN][colN].node.css("color", "#FC0");
 					}
 				}
 			}
@@ -414,7 +404,7 @@ function appendGearUpdates (gearUpdates) {
 	if(gearUpdates.length > 0) {
 		htmlContent += gearUpdates.map(function(el, index) {
 			if(index < 6) { // Hard limit to 6 items. Should be enough for most cases
-				return "<a href='index.php?box=armory&item=" + el.itemId + "'><img src='" + staticUrl + "images/wow/icons/small/" + el.icon.toLowerCase() + ".jpg' width='18' height='18' /> " + el.name + "</a> (" + dateToString(new Date(el.timestamp * 1000)) + ")<br />";
+				return "<a href='index.php?box=armory&item=" + el.itemId + "'><img src='" + STATIC_URL + "images/wow/icons/small/" + el.icon.toLowerCase() + ".jpg' width='18' height='18' /> " + el.name + "</a> (" + dateToString(new Date(el.timestamp * 1000)) + ")<br />";
 			}
 		}).join("");
 	}
