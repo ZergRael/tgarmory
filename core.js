@@ -140,9 +140,9 @@ function refactorItemTooltips () {
 }
 // Generic tooltip display
 function appendTooltips () {
-	$(document).on("mouseenter mouseleave", "a[href*=spell\\=], a[href*=item\\=]"/*, a[href*=npc\\=], a[href*=char\\=]"*/, function(e) {
+	$(document).on("mouseenter mouseleave", "a[href*=spell\\=], a[href*=item\\=], a[href*=npc\\=]", function(e) {
 		if(e.type == "mouseenter") {
-			var objMatch = $(this).attr("href").match(/(item|spell|npc|char)=(\d+)/);
+			var objMatch = $(this).attr("href").match(/(item|spell|npc)=(\d+)/);
 			if(!objMatch) { return; }
 			var prefix = objMatch[1].substr(0, 1),
 				objId = objMatch[2],
