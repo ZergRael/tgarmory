@@ -15,8 +15,8 @@ else { // Chrome
 }
 
 var cache = {},
-	STATIC_URL = "http://static.thetabx.net/",
-	API_URL = "http://api.thetabx.net/tgc/3/",
+	STATIC_URL = "https://static.thetabx.net/",
+	API_URL = "https://api.thetabx.net/tgc/3/",
 	DB_VERSION = 1,
 	ttDisp = {showing: false, hovering: false, isOriginalTooltip: false, tt: false, x: 0, y: 0},
 	invalidGuilds = ["Assistant communautaire", "Community Manager", "MVP", "Maître de jeu", "Administrateur", "Pas-de-Personnage"];

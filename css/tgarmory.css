@@ -1,6 +1,6 @@
 .tga_block {vertical-align: top;}
 .tga_frame {border-spacing: 0; border-collapse: collapse;}
-.tga_frame > tbody > tr > td, .tga_frame > tbody > tr > th {background: url(http://static.thetabx.net/images/wow/armory_stats.2.jpg);}
+.tga_frame > tbody > tr > td, .tga_frame > tbody > tr > th {background: url(https://static.thetabx.net/images/wow/armory_stats.2.jpg);}
 .tga_frame > tbody > tr > th {padding: 20 0 0 24!important;}
 .tga_frame > tbody > tr > td {padding: 14 0 0 18!important;}
 .tga_header {padding-left: 10px; font-weight: bold;}
@@ -15,13 +15,13 @@
 .arena_teams .arena_rating {color: #FC0; font-weight: bold; padding-left: 8px; padding-right: 8px;}
 .gear_updates {margin: 8px;}
 .gear_updates .tga_frame_content {min-width:438px;}
-.honorally_currency {padding-right: 17px; background: no-repeat right center; background-image: url(http://static.thetabx.net/images/wow/icons/tiny/pvpcurrency-honor-alliance.gif);}
-.honorhorde_currency {padding-right: 17px; background: no-repeat right center; background-image: url(http://static.thetabx.net/images/wow/icons/tiny/pvpcurrency-honor-horde.gif);}
+.honorally_currency {padding-right: 17px; background: no-repeat right center; background-image: url(https://static.thetabx.net/images/wow/icons/tiny/pvpcurrency-honor-alliance.gif);}
+.honorhorde_currency {padding-right: 17px; background: no-repeat right center; background-image: url(https://static.thetabx.net/images/wow/icons/tiny/pvpcurrency-honor-horde.gif);}
 .clearfloat {clear: both;}
 .centered {text-align: center;}
 .guild_page h1 {text-align: center; margin-top: 6px; font-size: 32px;}
-.guild_page .logo_h:before {content: url(http://static.thetabx.net/images/wow/armory/inv_bannerpvp_01.jpg);}
-.guild_page .logo_a:before {content: url(http://static.thetabx.net/images/wow/armory/inv_bannerpvp_02.jpg);}
+.guild_page .logo_h:before {content: url(https://static.thetabx.net/images/wow/armory/inv_bannerpvp_01.jpg);}
+.guild_page .logo_a:before {content: url(https://static.thetabx.net/images/wow/armory/inv_bannerpvp_02.jpg);}
 .armory_guild_chars {width: 850px; margin-top: 22px;}
 .armory_guild_downs {width: 360px; float: left;}
 .armory_guild_loots {width: 480px; float: left; margin-right: 10px;}

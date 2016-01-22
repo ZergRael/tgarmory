@@ -41,7 +41,7 @@ function preInit () {
 	if(isFirefox) { // Firefox does not automatically insert extension css
 		$("head").append("<link rel='stylesheet' type='text/css' href='" + _extUrl("css/tgarmory.css") + "' />");
 	}
-	$("head").append("<link rel='stylesheet' type='text/css' href='http://static.thetabx.net/css/wow/wowheadlike.css' />");
+	$("head").append("<link rel='stylesheet' type='text/css' href='https://static.thetabx.net/css/wow/wowheadlike.css' />");
 	$("#curseur").css("width", "auto");
 }
 
@@ -205,7 +205,7 @@ function fixAvatar () {
 	if($avatar) {
 		var avatarId = $avatar.attr("style").match(/(\d+)-(\d+)-(\d+)/);
 		if(avatarId && avatarId[2] > 9) {
-			$avatar.attr("style", $avatar.attr("style").replace(/img\/armory_icons\/avatars\/\d+-\d+-\d+\.gif/, "http://static.thetabx.net/images/wow/armory/avatars/" + avatarId[1] + "-" + avatarId[2] + "-" + avatarId[3] + ".gif"));
+			$avatar.attr("style", $avatar.attr("style").replace(/img\/armory_icons\/avatars\/\d+-\d+-\d+\.gif/, "https://static.thetabx.net/images/wow/armory/avatars/" + avatarId[1] + "-" + avatarId[2] + "-" + avatarId[3] + ".gif"));
 		}
 	}
 }
@@ -417,7 +417,7 @@ function appendGearUpdates (gearUpdates) {
 
 // team.members to html table row
 function teamToMembersHtml (team) {
-	return $.map(team.members, function(e) { return "<tr><td><a href='http://thegeekcrusade-serveur.com/index.php?box=armory&character=" + e.id + "'>" + e.name + "</a></td><td class='arena_rating'>" + e.rating + "</td><td><span class='arena_wins'>" + e.wins + "</span> - <span class='arena_loses'>" + e.loses + "</span></td><td><span class='arena_percent'>(" + e.percent + "%)</span></td></tr>"; }).join("");
+	return $.map(team.members, function(e) { return "<tr><td><a href='/index.php?box=armory&character=" + e.id + "'>" + e.name + "</a></td><td class='arena_rating'>" + e.rating + "</td><td><span class='arena_wins'>" + e.wins + "</span> - <span class='arena_loses'>" + e.loses + "</span></td><td><span class='arena_percent'>(" + e.percent + "%)</span></td></tr>"; }).join("");
 }
 
 // Arena teams if available
@@ -428,7 +428,7 @@ function appendArena (data) {
 		var team = data[brackets[i]];
 		if(!team) { continue; }
 		displayedTeams++;
-		htmlContent += "<div class='tga_bracket'>" + buildFrame("arena_teams", "<div class='arena_bracket'><a href='http://thegeekcrusade-serveur.com/index.php?box=pvp&type=" + brackets[i] + "'>" + brackets[i] + "v" + brackets[i] + "</a></div>" + team.name + " <a class='arena_position' href='http://thegeekcrusade-serveur.com/index.php?box=armory&team=" + team.id + "'>#" + team.position + "</a><br /><table><tbody><tr><td>Equipe</td><td class='arena_rating team_rating'>" + team.rating + "</td><td><span class='arena_wins'>" + team.wins + "</span> - <span class='arena_loses'>" + team.loses + "</span></td></tr>" + teamToMembersHtml(team) + "</tbody></table>") + "</div>";
+		htmlContent += "<div class='tga_bracket'>" + buildFrame("arena_teams", "<div class='arena_bracket'><a href='/index.php?box=pvp&type=" + brackets[i] + "'>" + brackets[i] + "v" + brackets[i] + "</a></div>" + team.name + " <a class='arena_position' href='/index.php?box=armory&team=" + team.id + "'>#" + team.position + "</a><br /><table><tbody><tr><td>Equipe</td><td class='arena_rating team_rating'>" + team.rating + "</td><td><span class='arena_wins'>" + team.wins + "</span> - <span class='arena_loses'>" + team.loses + "</span></td></tr>" + teamToMembersHtml(team) + "</tbody></table>") + "</div>";
 	}
 	if(htmlContent.length > 0) {
 		$("table.cursor").parent().children("br").first().replaceWith("<div id='arena_teams' class='tga_block'>" + htmlContent + "</div>");
