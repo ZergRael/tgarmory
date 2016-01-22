@@ -3,9 +3,10 @@
   "license": "MIT",
   "author": "ZergRael",
   "icon64": "data/images/tgarmory.64.png",
+  "name": "tgarmory",
+  "title": "TheGeekArmory",
   "version": "0.3.4",
-  "fullName": "TheGeekArmory",
-  "icon": "data/images/tgarmory.48.png",
   "id": "tgarmory@thetabx.net",
-  "name": "tgarmory"
+  "icon": "resource://tgarmory-at-thetabx-dot-net/data/images/tgarmory.48.png",
+  "updateURL": "https://thetabx.net/addon/tga/firefox/%APP_OS%/%CURRENT_APP_VERSION%/%ITEM_VERSION%/"
 }
