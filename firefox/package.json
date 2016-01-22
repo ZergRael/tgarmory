@@ -1,0 +1,11 @@
+{
+  "description": "Ameliorations sur l'armurerie de TheGeekCrusade-serveur.com",
+  "license": "MIT",
+  "author": "ZergRael",
+  "icon64": "data/images/tgarmory.64.png",
+  "version": "0.3.4",
+  "fullName": "TheGeekArmory",
+  "icon": "data/images/tgarmory.48.png",
+  "id": "tgarmory@thetabx.net",
+  "name": "tgarmory"
+}

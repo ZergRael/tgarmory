@@ -1,6 +1,9 @@
 test_data/
 build/
+firefox/data/
+tools/node_modules
 *.pyc
+*.creds
 
 .zip
 .DS_Store

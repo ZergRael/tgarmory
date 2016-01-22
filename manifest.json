@@ -19,5 +19,8 @@
       ],
       "css": ["css/tgarmory.css"]
     }
+  ],
+  "web_accessible_resources": [
+    "css/tgarmory.css"
   ]
 }
