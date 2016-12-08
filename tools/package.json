@@ -1,10 +1,10 @@
 {
   "name": "tools",
   "version": "1.0.0",
-  "description": "Build tools for tga firefox extension",
+  "description": "Build tools for extension",
   "main": "allBuild.js",
   "dependencies": {
-    "fs-extra": "^0.26.3"
+    "fs-extra": "^1.0"
   },
   "devDependencies": {},
   "scripts": {

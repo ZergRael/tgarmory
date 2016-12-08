@@ -2,103 +2,79 @@ var fs = require('fs-extra');
 var path = require('path');
 var exec = require('child_process').exec;
 
+function cleanUp() {
+  console.log('Firefox : Cleanups');
+  fs.removeSync(path.join('..', 'firefox'));
+  fs.mkdirsSync(path.join('..', 'firefox'));
+}
+
 function copyFiles() {
+  console.log('Firefox : Copy files');
   var copyDirs = ['images', 'lib', 'css'];
   copyDirs.forEach(function(d) {
-    fs.copySync(path.join('..', d), path.join('..', 'firefox', 'data', d));
+    fs.copySync(path.join('..', d), path.join('..', 'firefox', d));
   });
-  var filesReg = new RegExp(/\.(js)?$/);
+  var filesReg = new RegExp(/\.(js|json)?$/);
   var copyFiles = fs.readdirSync(path.join('..')).filter(function(f) {
     return filesReg.test(f);
   });
   copyFiles.forEach(function(f) {
-    fs.copySync(path.join('..', f), path.join('..', 'firefox', 'data', f));
+    fs.copySync(path.join('..', f), path.join('..', 'firefox', f));
   });
 }
 
 function updateManifest() {
-  var manifest = fs.readJsonSync(path.join('..', 'manifest.json'));
-  var packag = fs.readJsonSync(path.join('..', 'firefox', 'package.json'));
-  packag.version = manifest.version;
-  fs.writeJsonSync(path.join('..', 'firefox', 'package.json'), packag);
+  console.log('Firefox : Update manifest');
+  var manifest = fs.readJsonSync(path.join('..', 'firefox', 'manifest.json'));
+  manifest.applications = {
+    gecko: {
+      id: 'tgarmory@thetabx.net',
+      strict_min_version: '48.0',
+      update_url: 'https://thetabx.net/addon/tgarmory/firefox/%APP_OS%/%CURRENT_APP_VERSION%/%ITEM_VERSION%/',
+    }
+  };
+  fs.writeJsonSync(path.join('..', 'firefox', 'manifest.json'), manifest);
+}
 
-  var mainPrefix = [
-    '// Import the page-mod API',
-    'var pageMod = require(\'sdk/page-mod\');',
-    '// Import the self API',
-    'var self = require(\'sdk/self\');',
-    '// Import simple-storage API',
-    'var sstorage = require(\'sdk/simple-storage\');',
-    'pageMod.PageMod({',
-    '  include: [\'*.thegeekcrusade-serveur.com\'],',
-    '  contentScriptFile: [',
-    '',
+function doBuild(cb) {
+  console.log('Firefox : Build');
+  process.chdir(path.join('..', 'firefox'));
+  var firefoxCreds = fs.readJsonSync(path.join('..', 'tools', 'firefox.creds'));
+  var cmd = ['web-ext', 'sign', '--api-key', firefoxCreds.user, '--api-secret',
+    firefoxCreds.secret
   ];
-  var mainMid = [
-    '',
-    '  ],',
-    '  contentScriptOptions: {',
-    '',
-  ];
-  var mainSuffix = [
-    '',
-    '  },',
-    '  contentScriptWhen: \'ready\',',
-    '  onAttach: function(worker) {',
-    '    worker.port.on(\'storageGet\', function(key) {',
-    '      worker.port.emit(\'storageGet\' + key, sstorage.storage[key]);',
-    '    });',
-    '    worker.port.on(\'storageSet\', function(obj) {',
-    '      sstorage.storage[obj.key] = obj.val;',
-    '    });',
-    '  }',
-    '});',
-    '',
-  ];
-  var mainJs = [];
-  manifest.content_scripts[0].js.forEach(function(e) {
-    mainJs.push('    self.data.url(\'' + e + '\')');
+  exec(cmd.join(' '), function(error, stdout, stderr) {
+    if (stdout) {
+      console.log(stdout);
+    }
+    if (error) {
+      console.error(error);
+      return;
+    }
+    if (stderr) {
+      console.error(stderr);
+      return;
+    }
+    console.log('Success');
+    if (cb) {
+      cb();
+    }
   });
-  var mainRes = [];
-  manifest.web_accessible_resources.forEach(function(e) {
-    mainRes.push('    \'' + e + '\': self.data.url(\'' + e + '\')');
-  });
-
-  main = mainPrefix.join('\n') + mainJs.join(',\n') + mainMid.join('\n') + mainRes.join(',\n') + mainSuffix.join('\n');
-
-  fs.outputFileSync(path.join('..', 'firefox', 'index.js'), main);
 }
 
 var xpiReg = new RegExp(/\.xpi?$/);
-
-function cleanUp() {
-  var xpis = fs.readdirSync(path.join('..', 'firefox')).filter(function(f) {
-    return xpiReg.test(f);
-  });
-  xpis.forEach(function(xpi) {
-    fs.removeSync(path.join('..', 'firefox', xpi));
-  });
-}
-
-function runBuildCommand(cb) {
-  process.chdir(path.join('..', 'firefox'));
-  var cmd = ['jpm', 'xpi'];
-  exec(cmd.join(' '), function(error, stdout, stderr) {
-    console.log(stdout);
-    cb();
-  });
-}
-
 function moveXpi(cb) {
-  var xpis = fs.readdirSync('.').filter(function(f) {
+  console.log('Firefox : Move');
+  var artifactDir = 'web-ext-artifacts';
+  var xpis = fs.readdirSync(artifactDir).filter(function(f) {
     return xpiReg.test(f);
   });
   xpis.forEach(function(xpi) {
-    fs.move(xpi, path.join('..', 'build', 'tgarmory.xpi'), {
+    fs.move(path.join(artifactDir, xpi), path.join('..', 'build', 'tgarmory.xpi'), {
       clobber: true
     }, function(e) {
       if (e) {
-        console.log(e);
+        console.error(e);
       } else {
         cb();
       }
@@ -106,26 +82,13 @@ function moveXpi(cb) {
   });
 }
 
-function signXpi() {
-  process.chdir(path.join('..', 'build'));
-  var firefoxCreds = fs.readJsonSync(path.join('..', 'tools', 'firefox.creds'));
-  var cmd = ['jpm', 'sign', '--api-key', firefoxCreds.user, '--api-secret',
-  firefoxCreds.secret, '--xpi', 'tgarmory.xpi'];
-  exec(cmd.join(' '), function(error, stdout, stderr) {
-    console.log(stdout);
-    console.log('Success');
-  });
-}
-
-function build() {
+function build(cb) {
   console.log('Build firefox');
+  cleanUp();
   copyFiles();
   updateManifest();
-  cleanUp();
-  runBuildCommand(function() {
-    moveXpi(function() {
-      signXpi();
-    });
+  doBuild(function() {
+    moveXpi(cb);
   });
 }
 
