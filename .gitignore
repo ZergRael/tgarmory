@@ -1,7 +1,7 @@
 test_data/
 build/
-firefox/data/
 tools/node_modules
+firefox/
 *.pyc
 *.creds
 
