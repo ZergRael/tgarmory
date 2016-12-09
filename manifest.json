@@ -20,7 +20,8 @@
       "css": ["css/tgarmory.css"]
     }
   ],
-  "web_accessible_resources": [
-    "css/tgarmory.css"
+  "permissions": [ 
+    "storage",
+    "https://api.thetabx.net/*"
   ]
 }
