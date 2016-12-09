@@ -150,7 +150,7 @@ var ext = {
       var $wh = $('#wowhead');
       if ($wh.length) {
         $wh.parents('td[style]').css('height', '346px');
-      
+
         if ($wh.attr('data').indexOf('http://') != -1) {
           var $whVars = $wh.find('param[name="flashvars"]');
           if ($whVars.length) {
@@ -767,7 +767,8 @@ var ext = {
           $('<td>', {
             class: 'small_col'
           }).append(member.spec !== null ? $('<img>', {
-            src: ext.url.STATIC + 'images/wow/armory/spec/small/' + member.class + '-' + member.spec + '.jpg'
+            src: ext.url.STATIC + 'images/wow/armory/spec/small/' + member.class + '-' + member.spec +
+              '.jpg'
           }) : ''),
           $('<td>', {
             class: 'hmed_col centered',
@@ -970,6 +971,11 @@ var ext = {
           return;
         } // Char armory check
         if ($('table').length < 10) {
+          this.utils.getData({
+            data: {
+              'char': u.p.character
+            }
+          });
           return;
         } // Probably error page
         this.location = 'char';
