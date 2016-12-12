@@ -55,6 +55,30 @@ var ext = {
     },
   },
 
+  chars: {
+    appendSearch: function(data) {
+      var $tr = $('table[style="padding:0px; margin:0px;width:850px;"] tr:nth(1) table tr');
+      if ($tr.length === 0 || data.results.length === 0) {
+        return;
+      }
+      if ($tr.length == 1) {
+        $header = $('<tr>').append([
+            $('<td>', {style: 'width:300px;', align: 'center', text: 'Nom'}),
+            $('<td>', {style: 'width:50px;', align: 'center', text: 'Niveau'}),
+            $('<td>', {style: 'width:50px;', align: 'center', text: 'Rang'}),
+            $('<td>', {style: 'width:50px;', align: 'center', text: 'Race'}),
+            $('<td>', {style: 'width:50px;', align: 'center', text: 'Classe'}),
+            $('<td>', {style: 'width:50px;', align: 'center', text: 'Faction'}),
+            $('<td>', {style: 'width:300px;', align: 'center', text: 'Guilde'}),
+          ]);
+        $tr.before($header);
+      }
+      //var $tr = $('table[style="padding:0px; margin:0px;width:850px;"] tr:nth(1) table tr');
+      //console.log($tr);
+      //console.log(data);
+    }
+  },
+
   char: {
     refactorItemTooltips: function() {
       var enchantItemRegex = /<span style=\\"color:#0C0;\\">(?!Equipé|Utilisé|Chance)([^<]+)/;
@@ -987,6 +1011,11 @@ var ext = {
           return;
         } // Probably real page
         this.location = 'guild';
+      } else if (u.p.characters) {
+        if (u.p.characters.length === 0) {
+          return;
+        }
+        this.location = 'charsearch';
       }
     } else if (u.p.box && u.p.box == 'shopITE') {
       this.location = 'shop';
@@ -1013,6 +1042,21 @@ var ext = {
       });
       ext.char.fixAvatarAndPreview();
       ext.char.refactorItemTooltips();
+    }
+
+    if (this.location == 'charsearch') {
+      this.utils.getData({
+        url: 'search/char',
+        data: {
+          'fuzzy': true,
+          'q': u.p.characters,
+        }
+      }, function(ajx) {
+        if (ajx.status == 'success') {
+          ext.chars.appendSearch(ajx.data);
+        }
+      })
+      
     }
 
     if (this.location == 'guild') {
