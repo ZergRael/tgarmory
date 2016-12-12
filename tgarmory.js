@@ -68,6 +68,19 @@ var ext = {
       10: 'horde',
       11: 'alliance'
     },
+
+    reSearchButtons: function(state) {
+      $('input[name="search_armory"]:last').after($('<input>', {
+        type: 'checkbox',
+        checked: state
+      }).change(function() {
+        ext.storage.set('research', $(this).prop('checked'), function() {
+          window.location.reload();
+        });
+      }));
+      $('input[name="search_armory"]:last').siblings('span').text('reSearch');
+    },
+
     SEARCH_LIMIT: 50,
     reSearch: function(name, urlOrder, start, data) {
       $('table[style="padding:0px; margin:0px;width:850px;"] tr:nth(1) table tr').remove();
@@ -76,7 +89,7 @@ var ext = {
       var order = 'asc';
       if (urlOrder) {
         var split = urlOrder.split('-');
-        switch(split[0]) {
+        switch (split[0]) {
           case '2':
             sort = 'level';
             break;
@@ -116,7 +129,8 @@ var ext = {
           align: 'center'
         }).append(
           $('<a>', {
-            href: 'index.php?box=armory&characters=' + name + '&order=1-' + (sort == 'name' && order == 'desc' ? '0' : '1'),
+            href: 'index.php?box=armory&characters=' + name + '&order=1-' + (sort == 'name' && order ==
+              'desc' ? '0' : '1'),
             text: 'Nom'
           })),
         $('<td>', {
@@ -124,7 +138,8 @@ var ext = {
           align: 'center'
         }).append(
           $('<a>', {
-            href: 'index.php?box=armory&characters=' + name + '&order=2-' + (sort == 'level' && order == 'desc' ? '0' : '1'),
+            href: 'index.php?box=armory&characters=' + name + '&order=2-' + (sort == 'level' && order ==
+              'desc' ? '0' : '1'),
             text: 'Niveau'
           })),
         $('<td>', {
@@ -137,7 +152,8 @@ var ext = {
           align: 'center'
         }).append(
           $('<a>', {
-            href: 'index.php?box=armory&characters=' + name + '&order=3-' + (sort == 'race' && order == 'desc' ? '0' : '1'),
+            href: 'index.php?box=armory&characters=' + name + '&order=3-' + (sort == 'race' && order ==
+              'desc' ? '0' : '1'),
             text: 'Race'
           })),
         $('<td>', {
@@ -145,7 +161,8 @@ var ext = {
           align: 'center'
         }).append(
           $('<a>', {
-            href: 'index.php?box=armory&characters=' + name + '&order=4-' + (sort == 'class' && order == 'desc' ? '0' : '1'),
+            href: 'index.php?box=armory&characters=' + name + '&order=4-' + (sort == 'class' && order ==
+              'desc' ? '0' : '1'),
             text: 'Classe'
           })),
         $('<td>', {
@@ -226,7 +243,12 @@ var ext = {
         }).get(0).outerHTML);
       }
 
-      html.push($('<tr>').append($('<td>', {colspan: 7, align: 'center', class: 'armoryfooter', html: footer.join(' ')})).get(0).outerHTML);
+      html.push($('<tr>').append($('<td>', {
+        colspan: 7,
+        align: 'center',
+        class: 'armoryfooter',
+        html: footer.join(' ')
+      })).get(0).outerHTML);
 
       $('table[style="padding:0px; margin:0px;width:850px;"] tr:nth(1) table').get(0).innerHTML = html.join('');
     }
@@ -1065,32 +1087,38 @@ var ext = {
     },
     opt: {},
     date: {},
-    set: function(key, obj) {
+    set: function(key, obj, callback) {
       this.opt[key] = obj;
       this.date[key] = new Date().valueOf();
-      this.save();
+      this.save(callback);
     },
     get: function(key, def) {
       if (this.opt[key] === undefined) {
         return def;
       }
-      if (this.date[key] + this.expire[key] < new Date().valueOf()) {
+      if (this.expire[key] && this.date[key] + this.expire[key] < new Date().valueOf()) {
         this.set(key, def);
         return def;
       }
       return this.opt[key];
     },
     load: function(callback) {
-      chrome.storage.local.get('tga', function(o) {
-        ext.storage.opt = o;
+      chrome.storage.local.get(null, function(o) {
+        console.log(o);
+        ext.storage.opt = o.opt || {};
+        ext.storage.date = o.date || {};
         callback();
       });
     },
-    save: function() {
+    save: function(callback) {
       chrome.storage.local.set({
-        tga: this.opt
-      });
-    }
+        opt: this.opt,
+        date: this.date,
+      }, callback);
+    },
+    clear: function() {
+      chrome.storage.local.clear();
+    },
   },
 
   utils: {
@@ -1166,6 +1194,7 @@ var ext = {
     }
 
     var u = this.utils.parseUrl(window.location.href);
+    ext.u = u;
     if (!u || u.path == '/db/') {
       return;
     }
@@ -1227,10 +1256,6 @@ var ext = {
       ext.char.refactorItemTooltips();
     }
 
-    if (this.location == 'charsearch') {
-      ext.chars.reSearch(u.p.characters, u.p.order, Number(u.p.start || 0));
-    }
-
     if (this.location == 'guild') {
       ext.guild.init(u.p.guild);
     }
@@ -1242,8 +1267,16 @@ var ext = {
     if (this.location != 'shop') {
       ext.global.buildGuildLinks();
     }
+
+    if (this.location == 'charsearch') {
+      if (ext.storage.get('research', false)) {
+        ext.chars.reSearch(ext.u.p.characters, ext.u.p.order, Number(ext.u.p.start || 0));
+      }
+      ext.chars.reSearchButtons(ext.storage.get('research', false));
+    }
   },
 }
 
+//ext.storage.clear();
 ext.load();
 ext.run();
