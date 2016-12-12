@@ -56,26 +56,179 @@ var ext = {
   },
 
   chars: {
-    appendSearch: function(data) {
-      var $tr = $('table[style="padding:0px; margin:0px;width:850px;"] tr:nth(1) table tr');
-      if ($tr.length === 0 || data.results.length === 0) {
-        return;
+    raceToSide: {
+      1: 'alliance',
+      2: 'horde',
+      3: 'alliance',
+      4: 'alliance',
+      5: 'horde',
+      6: 'horde',
+      7: 'alliance',
+      8: 'horde',
+      10: 'horde',
+      11: 'alliance'
+    },
+    SEARCH_LIMIT: 50,
+    reSearch: function(name, urlOrder, start, data) {
+      $('table[style="padding:0px; margin:0px;width:850px;"] tr:nth(1) table tr').remove();
+
+      var sort = 'name';
+      var order = 'asc';
+      if (urlOrder) {
+        var split = urlOrder.split('-');
+        switch(split[0]) {
+          case '2':
+            sort = 'level';
+            break;
+          case '3':
+            sort = 'race';
+            break;
+          case '4':
+            sort = 'class';
+            break;
+        }
+        if (split[1] == '1') {
+          order = 'desc';
+        }
       }
-      if ($tr.length == 1) {
-        $header = $('<tr>').append([
-            $('<td>', {style: 'width:300px;', align: 'center', text: 'Nom'}),
-            $('<td>', {style: 'width:50px;', align: 'center', text: 'Niveau'}),
-            $('<td>', {style: 'width:50px;', align: 'center', text: 'Rang'}),
-            $('<td>', {style: 'width:50px;', align: 'center', text: 'Race'}),
-            $('<td>', {style: 'width:50px;', align: 'center', text: 'Classe'}),
-            $('<td>', {style: 'width:50px;', align: 'center', text: 'Faction'}),
-            $('<td>', {style: 'width:300px;', align: 'center', text: 'Guilde'}),
-          ]);
-        $tr.before($header);
+      ext.utils.getData({
+        url: 'search/char',
+        data: {
+          fuzzy: true,
+          q: name,
+          sort: sort,
+          order: order,
+          limit: ext.chars.SEARCH_LIMIT,
+          start: start,
+        }
+      }, function(ajx) {
+        if (ajx.status == 'success') {
+          ext.chars.setChars(name, sort, order, start, ajx.data);
+        }
+      });
+    },
+
+    setChars: function(name, sort, order, start, data) {
+      var html = [];
+      html.push($('<tr>').append([
+        $('<td>', {
+          style: 'width:300px;',
+          align: 'center'
+        }).append(
+          $('<a>', {
+            href: 'index.php?box=armory&characters=' + name + '&order=1-' + (sort == 'name' && order == 'desc' ? '0' : '1'),
+            text: 'Nom'
+          })),
+        $('<td>', {
+          style: 'width:50px;',
+          align: 'center'
+        }).append(
+          $('<a>', {
+            href: 'index.php?box=armory&characters=' + name + '&order=2-' + (sort == 'level' && order == 'desc' ? '0' : '1'),
+            text: 'Niveau'
+          })),
+        $('<td>', {
+          style: 'width:50px;',
+          align: 'center',
+          text: 'Rang'
+        }),
+        $('<td>', {
+          style: 'width:50px;',
+          align: 'center'
+        }).append(
+          $('<a>', {
+            href: 'index.php?box=armory&characters=' + name + '&order=3-' + (sort == 'race' && order == 'desc' ? '0' : '1'),
+            text: 'Race'
+          })),
+        $('<td>', {
+          style: 'width:50px;',
+          align: 'center'
+        }).append(
+          $('<a>', {
+            href: 'index.php?box=armory&characters=' + name + '&order=4-' + (sort == 'class' && order == 'desc' ? '0' : '1'),
+            text: 'Classe'
+          })),
+        $('<td>', {
+          style: 'width:50px;',
+          align: 'center',
+          text: 'Faction'
+        }),
+        $('<td>', {
+          style: 'width:300px;',
+          align: 'center',
+          text: 'Guilde'
+        }),
+      ]).get(0).outerHTML);
+
+      data.results.forEach(function(e) {
+        html.push($('<tr>').append([
+          $('<td>', {
+            class: 'armory_search_header_td',
+            align: 'left'
+          }).append($('<a>', {
+            href: 'index.php?box=armory&character=' + e.id,
+            text: e.name
+          })),
+          $('<td>', {
+            class: 'armory_search_header_td',
+            align: 'center',
+            text: e.level
+          }),
+          $('<td>', {
+            class: 'armory_search_header_td',
+            align: 'center'
+          }),
+          $('<td>', {
+            class: 'armory_search_header_td',
+            align: 'center'
+          }).append($('<img>', {
+            src: 'img/race-' + e.race + '.gif'
+          })),
+          $('<td>', {
+            class: 'armory_search_header_td',
+            align: 'center'
+          }).append($('<img>', {
+            src: 'img/class-' + e.class + '.gif'
+          })),
+          $('<td>', {
+            class: 'armory_search_header_td',
+            align: 'center'
+          }).append($('<img>', {
+            src: 'img/' + ext.chars.raceToSide[e.race] + '.gif'
+          })),
+          $('<td>', {
+            class: 'armory_search_header_td',
+            align: 'center'
+          }).append(e.guild ? $('<a>', {
+            href: '/index.php?box=armory&guild=' + e.guild,
+            text: e.guildName
+          }) : ''),
+        ]).get(0).outerHTML);
+      });
+
+      var footer = [
+        data.count + ' personnage' + (data.count == 1 ? '' : 's') + ' affiché' + (data.count == 1 ? '' :
+          's'),
+      ];
+
+      if (start > 0) {
+        footer.unshift($('<a>', {
+          href: '/index.php?box=armory&characters=' + name + '&order=' + order + '&start=' + (start - ext.chars
+            .SEARCH_LIMIT),
+          text: 'Précédent <<'
+        }).get(0).outerHTML);
       }
-      //var $tr = $('table[style="padding:0px; margin:0px;width:850px;"] tr:nth(1) table tr');
-      //console.log($tr);
-      //console.log(data);
+      if (data.count == ext.chars.SEARCH_LIMIT) {
+        footer.push($('<a>', {
+          href: '/index.php?box=armory&characters=' + name + '&order=' + order + '&start=' + (start + ext.chars
+            .SEARCH_LIMIT),
+          text: '>> Suivant'
+        }).get(0).outerHTML);
+      }
+
+      html.push($('<tr>').append($('<td>', {colspan: 7, align: 'center', class: 'armoryfooter', html: footer.join(' ')})).get(0).outerHTML);
+
+      $('table[style="padding:0px; margin:0px;width:850px;"] tr:nth(1) table').get(0).innerHTML = html.join('');
     }
   },
 
@@ -110,8 +263,10 @@ var ext = {
               item.url.enchstr = encodeURIComponent($.trim(enchMatch[1]));
             }
             // Keep original tooltip for ctrl comparison
-            item.originalTooltip = item.mouseover.substring(8, item.mouseover.length - 3).replace(/\\"/g, '"');
-            $this.removeAttr('onmouseover').removeAttr('onmouseout').children('a').attr('data_slot', slot);
+            item.originalTooltip = item.mouseover.substring(8, item.mouseover.length - 3).replace(
+              /\\"/g, '"');
+            $this.removeAttr('onmouseover').removeAttr('onmouseout').children('a').attr('data_slot',
+              slot);
           }
           ext.cache[item.hash] = item;
         }
@@ -152,7 +307,8 @@ var ext = {
         }
         var numSlot = slots.indexOf(slot);
         var itemHash = 'i' + gear[slot].itemId + '_' + numSlot;
-        if (ext.cache[itemHash] && ext.cache[itemHash].slot == numSlot && gear[slot].gems && gear[slot].gems.length) {
+        if (ext.cache[itemHash] && ext.cache[itemHash].slot == numSlot && gear[slot].gems && gear[slot]
+          .gems.length) {
           ext.cache[itemHash].cache = null;
           ext.cache[itemHash].url.gems = gear[slot].gems.join(':');
         }
@@ -165,8 +321,10 @@ var ext = {
       if ($avatar.length) {
         var avatarId = $avatar.attr('style').match(/(\d+)-(\d+)-(\d+)/);
         if (avatarId && avatarId[2] > 9) {
-          $avatar.attr('style', $avatar.attr('style').replace(/img\/armory_icons\/avatars\/\d+-\d+-\d+\.gif/,
-            'https://static.thetabx.net/images/wow/armory/avatars/' + avatarId[1] + '-' + avatarId[2] + '-' +
+          $avatar.attr('style', $avatar.attr('style').replace(
+            /img\/armory_icons\/avatars\/\d+-\d+-\d+\.gif/,
+            'https://static.thetabx.net/images/wow/armory/avatars/' + avatarId[1] + '-' + avatarId[
+              2] + '-' +
             avatarId[3] + '.gif'));
         }
       }
@@ -347,7 +505,8 @@ var ext = {
           }
         }
         if (lastGuild && lastGuild.timestamp) {
-          htmlContent += 'A ' + (lastGuild.state == 'left' ? 'quitté' : 'rejoint') + ' &lt;' + lastGuild.guildName +
+          htmlContent += 'A ' + (lastGuild.state == 'left' ? 'quitté' : 'rejoint') + ' &lt;' +
+            lastGuild.guildName +
             '&gt; le ' + ext.utils.dateToString(new Date(lastGuild.timestamp * 1000)); // Firefox doesn't understand ruby Date.to_string, let's fallback on timestamp * 1000
         } else {
           htmlContent += 'Pas de changement de guilde récent';
@@ -388,7 +547,8 @@ var ext = {
       htmlContent += '</div><br />';
       // Spec summary with proper locale
       if (data.talents.text) {
-        htmlContent += '<div class="tga_spec"><a href="' + data.talents.url + '">Spécialisation (' + data.talents.text +
+        htmlContent += '<div class="tga_spec"><a href="' + data.talents.url + '">Spécialisation (' +
+          data.talents.text +
           ')</a>';
         if (data.talents.dominantTree !== null) {
           htmlContent += ' orientée <i>' + specs[data.class][data.talents.dominantTree] + '</i>';
@@ -398,9 +558,11 @@ var ext = {
       // Honor
       if (data.honor) {
         var spanSide = data.side == 2 ? 'honorally_currency' : 'honorhorde_currency';
-        htmlContent += '<div class="tga_honor">JcJ : ' + data.honor.todayKills + ' / <span class="' + spanSide +
+        htmlContent += '<div class="tga_honor">JcJ : ' + data.honor.todayKills + ' / <span class="' +
+          spanSide +
           '">' +
-          data.honor.todayHonor + '</span> - Hier : ' + data.honor.yesterdayKills + ' / <span class="' + spanSide +
+          data.honor.todayHonor + '</span> - Hier : ' + data.honor.yesterdayKills + ' / <span class="' +
+          spanSide +
           '">' +
           data.honor.yesterdayHonor + '</span>' + ' - A vie : ' + data.honor.totalKills + '</div>';
       }
@@ -418,12 +580,14 @@ var ext = {
 
     // Last gear pieces equipped list
     appendGearUpdates: function(gearUpdates) {
-      var htmlContent = '<span class="tga_header">Derniers loots (niveau d\'objet supérieur à 114) :</span><br />';
+      var htmlContent =
+        '<span class="tga_header">Derniers loots (niveau d\'objet supérieur à 114) :</span><br />';
       if (gearUpdates.length > 0) {
         htmlContent += gearUpdates.map(function(el, index) {
           if (index < 6) { // Hard limit to 6 items. Should be enough for most cases
             return '<a href="index.php?box=armory&item=' + el.itemId + '"><img src="' + ext.url.STATIC +
-              'images/wow/icons/small/' + el.icon.toLowerCase() + '.jpg" width="18" height="18" /> ' + el.name +
+              'images/wow/icons/small/' + el.icon.toLowerCase() +
+              '.jpg" width="18" height="18" /> ' + el.name +
               '</a> (' + ext.utils.dateToString(new Date(el.timestamp * 1000)) + ')<br />';
           }
         }).join('');
@@ -431,7 +595,8 @@ var ext = {
         htmlContent += 'Pas de loots récents<br />';
       }
       // replace <br />, less waste of room
-      $('table.cursor').parent().children('br').first().replaceWith('<div id="gear_updates" class="tga_block">' +
+      $('table.cursor').parent().children('br').first().replaceWith(
+        '<div id="gear_updates" class="tga_block">' +
         ext.utils.buildFrame('gear_updates', htmlContent) + '</div>');
     },
 
@@ -439,8 +604,10 @@ var ext = {
     teamToMembersHtml: function(team) {
       return $.map(team.members, function(e) {
         return '<tr><td><a href="/index.php?box=armory&character=' + e.id + '">' + e.name +
-          '</a></td><td class="arena_rating">' + e.rating + '</td><td><span class="arena_wins">' + e.wins +
-          '</span> - <span class="arena_loses">' + e.loses + '</span></td><td><span class="arena_percent">(' +
+          '</a></td><td class="arena_rating">' + e.rating + '</td><td><span class="arena_wins">' +
+          e.wins +
+          '</span> - <span class="arena_loses">' + e.loses +
+          '</span></td><td><span class="arena_percent">(' +
           e.percent + '%)</span></td></tr>';
       }).join('');
     },
@@ -460,17 +627,21 @@ var ext = {
         }
         displayedTeams++;
         htmlContent += '<div class="tga_bracket">' + ext.utils.buildFrame('arena_teams',
-          '<div class="arena_bracket"><a href="/index.php?box=pvp&type=' + brackets[i] + '">' + brackets[i] + 'v' +
-          brackets[i] + '</a></div>' + team.name + ' <a class="arena_position" href="/index.php?box=armory&team=' +
+          '<div class="arena_bracket"><a href="/index.php?box=pvp&type=' + brackets[i] + '">' +
+          brackets[i] + 'v' +
+          brackets[i] + '</a></div>' + team.name +
+          ' <a class="arena_position" href="/index.php?box=armory&team=' +
           team.id +
           '">#' + team.position +
           '</a><br /><table><tbody><tr><td>Equipe</td><td class="arena_rating team_rating">' +
-          team.rating + '</td><td><span class="arena_wins">' + team.wins + '</span> - <span class="arena_loses">' +
+          team.rating + '</td><td><span class="arena_wins">' + team.wins +
+          '</span> - <span class="arena_loses">' +
           team.loses +
           '</span></td></tr>' + ext.char.teamToMembersHtml(team) + '</tbody></table>') + '</div>';
       }
       if (htmlContent.length > 0) {
-        $('table.cursor').parent().children('br').first().replaceWith('<div id="arena_teams" class="tga_block">' +
+        $('table.cursor').parent().children('br').first().replaceWith(
+          '<div id="arena_teams" class="tga_block">' +
           htmlContent + '</div>');
       }
       // If there's only one bracket to display, try to inline it with the gearUpdates frame
@@ -482,54 +653,56 @@ var ext = {
 
   global: {
     appendTooltips: function() {
-      $(document).on('mouseenter mouseleave', 'a[href*=spell\\=], a[href*=item\\=], a[href*=npc\\=]', function(e) {
-        if (e.type == 'mouseenter') {
-          var objMatch = $(this).attr('href').match(/(item|spell|npc)=(\d+)/);
-          if (!objMatch) {
-            return;
-          }
-          var prefix = objMatch[1].substr(0, 1);
-          var objId = objMatch[2];
-          var slot = $(this).attr('data_slot');
-          var hash = prefix + objId + (slot ? '_' + slot : '');
-          var obj = ext.cache[hash];
-          ext.tt.hovering = hash;
-          if (obj && obj.cache) {
-            ext.tt.showing = obj.hash;
-            if (ext.tt.isOriginalTooltip && obj.originalTooltip) {
-              ext.tt.show(obj.originalTooltip);
+      $(document).on('mouseenter mouseleave', 'a[href*=spell\\=], a[href*=item\\=], a[href*=npc\\=]',
+        function(e) {
+          if (e.type == 'mouseenter') {
+            var objMatch = $(this).attr('href').match(/(item|spell|npc)=(\d+)/);
+            if (!objMatch) {
+              return;
+            }
+            var prefix = objMatch[1].substr(0, 1);
+            var objId = objMatch[2];
+            var slot = $(this).attr('data_slot');
+            var hash = prefix + objId + (slot ? '_' + slot : '');
+            var obj = ext.cache[hash];
+            ext.tt.hovering = hash;
+            if (obj && obj.cache) {
+              ext.tt.showing = obj.hash;
+              if (ext.tt.isOriginalTooltip && obj.originalTooltip) {
+                ext.tt.show(obj.originalTooltip);
+              } else {
+                ext.tt.show(obj.cache);
+              }
             } else {
-              ext.tt.show(obj.cache);
+              if (!obj) {
+                obj = {
+                  id: objId,
+                  hash: hash,
+                  url: {}
+                };
+                obj.url[objMatch[1]] = objId;
+                obj.url.tooltip = 1;
+                ext.cache[obj.hash] = obj;
+              }
+              ext.utils.getData({
+                data: obj.url
+              }, function(data) {
+                obj.cache = data;
+                if (ext.tt.hovering == obj.hash) {
+                  ext.tt.showing = obj.hash;
+                  if (ext.tt.isOriginalTooltip && obj.originalTooltip) {
+                    ext.tt.show(obj.originalTooltip);
+                  } else {
+                    ext.tt.show(obj.cache);
+                  }
+                }
+              });
             }
           } else {
-            if (!obj) {
-              obj = {
-                id: objId,
-                hash: hash,
-                url: {}
-              };
-              obj.url[objMatch[1]] = objId;
-              obj.url.tooltip = 1;
-              ext.cache[obj.hash] = obj;
-            }
-            ext.utils.getData({
-              data: obj.url
-            }, function(data) {
-              obj.cache = data;
-              if (ext.tt.hovering == obj.hash) {
-                ext.tt.showing = obj.hash;
-                if (ext.tt.isOriginalTooltip && obj.originalTooltip) {
-                  ext.tt.show(obj.originalTooltip);
-                } else {
-                  ext.tt.show(obj.cache);
-                }
-              }
-            });
+            ext.tt.hide();
           }
-        } else {
-          ext.tt.hide();
         }
-      });
+      );
     },
 
     buildGuildLinks: function() {
@@ -601,7 +774,8 @@ var ext = {
       for (var name in guilds) {
         if (guilds[name].id) {
           for (var n in guilds[name].nodes) {
-            guilds[name].nodes[n].wrapInner('<a href="/index.php?box=armory&guild=' + guilds[name].id + '">');
+            guilds[name].nodes[n].wrapInner('<a href="/index.php?box=armory&guild=' + guilds[name].id +
+              '">');
           }
         }
       }
@@ -609,7 +783,8 @@ var ext = {
   },
 
   guild: {
-    invalidNames: ['Assistant communautaire', 'Community Manager', 'MVP', 'Maître de jeu', 'Administrateur',
+    invalidNames: ['Assistant communautaire', 'Community Manager', 'MVP', 'Maître de jeu',
+      'Administrateur',
       'Pas-de-Personnage'
     ],
 
@@ -743,14 +918,16 @@ var ext = {
         //  detailsHtml.push($('<br>'));
         //}
         //detailsHtml.push(guild.displayedMembersCount + ' membres');
-        detailsHtml.push((detailsHtml.length ? '<br />' : '') + guild.displayedMembersCount + ' membres');
+        detailsHtml.push((detailsHtml.length ? '<br />' : '') + guild.displayedMembersCount +
+          ' membres');
       }
       if (guild.progressText) {
         //detailsHtml.push($('<a>', {href: '/index.php?box=pve', text: 'Progression : ' + guild.progressText}));
         detailsHtml.push('<a href="/index.php?box=pve">Progression : ' + guild.progressText + '</a>');
       }
       if (guild.creationTimestamp) {
-        detailsHtml.push('Guilde créée le ' + ext.utils.dateToString(new Date(guild.creationTimestamp * 1000)));
+        detailsHtml.push('Guilde créée le ' + ext.utils.dateToString(new Date(guild.creationTimestamp *
+          1000)));
       }
       if (!detailsHtml.length) {
         detailsHtml.push(
@@ -791,19 +968,22 @@ var ext = {
           $('<td>', {
             class: 'small_col'
           }).append(member.spec !== null ? $('<img>', {
-            src: ext.url.STATIC + 'images/wow/armory/spec/small/' + member.class + '-' + member.spec +
+            src: ext.url.STATIC + 'images/wow/armory/spec/small/' + member.class + '-' + member
+              .spec +
               '.jpg'
           }) : ''),
           $('<td>', {
             class: 'hmed_col centered',
-            text: member.lastAct > 0 ? ext.utils.dateToString(new Date(member.lastAct * 1000), true) : ''
+            text: member.lastAct > 0 ? ext.utils.dateToString(new Date(member.lastAct * 1000),
+              true) : ''
           })
         ));
       }
       membersHtml.push($('<tr>').append($('<td>', {
         colspan: 6,
         class: 'armoryfooter',
-        text: membersHtml.length + ' personnages affichés (personnages actifs 60 derniers jours)'
+        text: membersHtml.length +
+          ' personnages affichés (personnages actifs 60 derniers jours)'
       })));
       $('.armory_guild_chars tbody').append(membersHtml);
 
@@ -816,7 +996,8 @@ var ext = {
           }).append($('<a>', {
             href: '/index.php?box=armory&item=' + loot.itemId
           }).append($('<img>', {
-            src: ext.url.STATIC + 'images/wow/icons/small/' + loot.icon.toLowerCase() + '.jpg',
+            src: ext.url.STATIC + 'images/wow/icons/small/' + loot.icon.toLowerCase() +
+              '.jpg',
             width: 18,
             height: 18
           }), ' ' + loot.name)),
@@ -873,7 +1054,8 @@ var ext = {
 
   init: function() {
     $('head').append(
-      '<link rel="stylesheet" type="text/css" href="https://static.thetabx.net/css/wow/wowheadlike.css" />');
+      '<link rel="stylesheet" type="text/css" href="https://static.thetabx.net/css/wow/wowheadlike.css" />'
+    );
     $('#curseur').css('width', 'auto');
   },
 
@@ -966,7 +1148,8 @@ var ext = {
 
     // Create a table with proper borders
     buildFrame: function(className, content) {
-      return '<table class="tga_frame ' + className + '"><tbody><tr><td class="tga_frame_content">' + content +
+      return '<table class="tga_frame ' + className + '"><tbody><tr><td class="tga_frame_content">' +
+        content +
         '</td><th style="background-position: top right;"></th></tr><tr><th style="background-position: bottom left;"></th><th style="background-position: bottom right;"></th></tr></tbody></table>';
     },
   },
@@ -1045,18 +1228,7 @@ var ext = {
     }
 
     if (this.location == 'charsearch') {
-      this.utils.getData({
-        url: 'search/char',
-        data: {
-          'fuzzy': true,
-          'q': u.p.characters,
-        }
-      }, function(ajx) {
-        if (ajx.status == 'success') {
-          ext.chars.appendSearch(ajx.data);
-        }
-      })
-      
+      ext.chars.reSearch(u.p.characters, u.p.order, Number(u.p.start || 0));
     }
 
     if (this.location == 'guild') {
