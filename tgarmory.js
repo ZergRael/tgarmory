@@ -116,12 +116,12 @@ var ext = {
         }
       }, function(ajx) {
         if (ajx.status == 'success') {
-          ext.chars.setChars(name, sort, order, start, ajx.data);
+          ext.chars.setChars(name, urlOrder, sort, order, start, ajx.data);
         }
       });
     },
 
-    setChars: function(name, sort, order, start, data) {
+    setChars: function(name, urlOrder, sort, order, start, data) {
       var html = [];
       html.push($('<tr>').append([
         $('<td>', {
@@ -230,14 +230,14 @@ var ext = {
 
       if (start > 0) {
         footer.unshift($('<a>', {
-          href: '/index.php?box=armory&characters=' + name + '&order=' + order + '&start=' + (start - ext.chars
+          href: '/index.php?box=armory&characters=' + name + '&order=' + urlOrder + '&start=' + (start - ext.chars
             .SEARCH_LIMIT),
           text: 'Précédent <<'
         }).get(0).outerHTML);
       }
       if (data.count == ext.chars.SEARCH_LIMIT) {
         footer.push($('<a>', {
-          href: '/index.php?box=armory&characters=' + name + '&order=' + order + '&start=' + (start + ext.chars
+          href: '/index.php?box=armory&characters=' + name + '&order=' + urlOrder + '&start=' + (start + ext.chars
             .SEARCH_LIMIT),
           text: '>> Suivant'
         }).get(0).outerHTML);
