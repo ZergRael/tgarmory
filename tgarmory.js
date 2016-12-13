@@ -478,7 +478,8 @@ var ext = {
     },
 
     fixName: function(name) {
-      var $name = $('td[style="width:232px;text-align:center; color:#FFF; font-size:11px; padding-top:20px;"] strong');
+      var $name = $(
+        'td[style="width:232px;text-align:center; color:#FFF; font-size:11px; padding-top:20px;"] strong');
       if ($name.text().indexOf('?') != -1) {
         $name.text(name);
       }
@@ -1156,7 +1157,7 @@ var ext = {
 
     okChar: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþ ',
     fixEncode: function(str) {
-      for(var i = 0; i < str.length; i++) {
+      for (var i = 0; i < str.length; i++) {
         if (ext.utils.okChar.indexOf(str[i]) == -1) {
           return decodeURIComponent(escape(str));
         }
