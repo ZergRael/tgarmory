@@ -1288,7 +1288,7 @@ var ext = {
 
     if (this.location == 'charsearch') {
       if (ext.storage.get('research', false)) {
-        ext.chars.reSearch(ext.u.p.characters, ext.u.p.order, Number(ext.u.p.start || 0));
+        ext.chars.reSearch(ext.u.p.characters, ext.u.p.order || "1-0", Number(ext.u.p.start || 0));
       }
       ext.chars.reSearchButtons(ext.storage.get('research', false));
     }
