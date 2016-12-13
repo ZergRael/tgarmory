@@ -477,6 +477,13 @@ var ext = {
       });
     },
 
+    fixName: function(name) {
+      var $name = $('td[style="width:232px;text-align:center; color:#FFF; font-size:11px; padding-top:20px;"] strong');
+      if ($name.indexOf('?')) {
+        $name.text(name);
+      }
+    },
+
     // Buttload of updates on character
     appendUpdates: function(data) {
       var htmlContent = '';
@@ -1249,6 +1256,7 @@ var ext = {
           ext.char.appendGearUpdates(cData.gearUpdates);
           ext.char.appendArena(cData.arena);
           ext.char.fixTalents(cData.talents);
+          ext.char.fixName(cData.name);
           ext.char.gemsTooltips(cData.items);
         }
       });
