@@ -479,7 +479,7 @@ var ext = {
 
     fixName: function(name) {
       var $name = $('td[style="width:232px;text-align:center; color:#FFF; font-size:11px; padding-top:20px;"] strong');
-      if ($name.text().indexOf('?')) {
+      if ($name.text().indexOf('?') != -1) {
         $name.text(name);
       }
     },
