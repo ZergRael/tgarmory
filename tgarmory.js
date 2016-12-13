@@ -749,7 +749,7 @@ var ext = {
         if (bName === '') {
           return;
         }
-        var name = bName.indexOf('<') == -1 ? bName : bName.substring(1, bName.length - 1);
+        var name = ext.utils.fixEncode(bName.indexOf('<') == -1 ? bName : bName.substring(1, bName.length - 1));
         if (ext.guild.invalidNames.indexOf(name) != -1) {
           return;
         }
@@ -1111,7 +1111,6 @@ var ext = {
     },
     load: function(callback) {
       chrome.storage.local.get(null, function(o) {
-        console.log(o);
         ext.storage.opt = o.opt || {};
         ext.storage.date = o.date || {};
         callback();
@@ -1153,6 +1152,17 @@ var ext = {
         u.p[kv[0]] = kv[1];
       }
       return u;
+    },
+
+    okChar: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþ ',
+    fixEncode: function(str) {
+      for(var i = 0; i < str.length; i++) {
+        if (ext.utils.okChar.indexOf(str[i]) == -1) {
+          return decodeURIComponent(escape(str));
+        }
+      }
+
+      return str;
     },
 
     getData: function(o, callback) {
