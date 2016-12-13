@@ -1,8 +1,8 @@
 .tga_block {vertical-align: top;}
 .tga_frame {border-spacing: 0; border-collapse: collapse;}
 .tga_frame > tbody > tr > td, .tga_frame > tbody > tr > th {background: url(https://static.thetabx.net/images/wow/armory_stats.2.jpg);}
-.tga_frame > tbody > tr > th {padding: 20 0 0 24!important;}
-.tga_frame > tbody > tr > td {padding: 14 0 0 18!important;}
+.tga_frame > tbody > tr > th {padding: 20px 0 0 24px;}
+.tga_frame > tbody > tr > td {padding: 14px 0 0 18px;}
 .tga_header {padding-left: 10px; font-weight: bold;}
 #arena_teams {padding-bottom: 10px;}
 .tga_bracket {display: inline-block; vertical-align: top;}
